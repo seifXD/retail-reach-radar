@@ -19,7 +19,7 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
   const retailers = [
     {
       id: 1,
-      name: "Premium Electronics Store",
+      name: "John Smith",
       contact: "John Smith",
       phone: "+1 (555) 123-4567",
       email: "john@premiumelectronics.com",
@@ -39,7 +39,7 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
     },
     {
       id: 2,
-      name: "City Hardware Depot",
+      name: "Maria Garcia",
       contact: "Maria Garcia",
       phone: "+1 (555) 234-5678",
       email: "maria@cityhardware.com",
@@ -59,7 +59,7 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
     },
     {
       id: 3,
-      name: "Downtown Furniture Co.",
+      name: "Robert Johnson",
       contact: "Robert Johnson",
       phone: "+1 (555) 345-6789",
       email: "robert@dtfurniture.com",

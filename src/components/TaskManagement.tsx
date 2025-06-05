@@ -28,33 +28,33 @@ const TaskManagement = ({ userRole }: TaskManagementProps) => {
   const tasks = [
     {
       id: 1,
-      title: "Contact Premium Electronics Store",
+      title: "Contact Michael Thompson",
       description: "Follow up on product line interest. Prepare proposal.",
       assignedTo: "Sarah Johnson",
       priority: "High",
       dueDate: "2023-12-16",
       status: "In Progress",
-      retailer: "Premium Electronics Store"
+      retailer: "Michael Thompson"
     },
     {
       id: 2,
-      title: "Credit review for City Hardware",
+      title: "Credit review for Maria Garcia",
       description: "Review payment history and adjust credit terms if needed.",
       assignedTo: "Mike Chen",
       priority: "Medium",
       dueDate: "2023-12-17",
       status: "Pending",
-      retailer: "City Hardware Depot"
+      retailer: "Maria Garcia"
     },
     {
       id: 3,
-      title: "Large order processing",
+      title: "Large order processing for Robert Johnson",
       description: "Process and confirm large furniture order. Verify inventory.",
       assignedTo: "Emma Davis",
       priority: "High",
       dueDate: "2023-12-15",
       status: "Completed",
-      retailer: "Downtown Furniture Co."
+      retailer: "Robert Johnson"
     },
     {
       id: 4,
@@ -64,7 +64,7 @@ const TaskManagement = ({ userRole }: TaskManagementProps) => {
       priority: "Low",
       dueDate: "2023-12-20",
       status: "Pending",
-      retailer: "Multiple"
+      retailer: "Multiple retailers"
     }
   ];
 
@@ -224,7 +224,7 @@ const TaskManagement = ({ userRole }: TaskManagementProps) => {
                       <Calendar className="h-4 w-4" />
                       <span>Due: {task.dueDate}</span>
                     </div>
-                    <span>Retailer: {task.retailer}</span>
+                    <span>Contact: {task.retailer}</span>
                   </div>
                 </div>
                 <div className="flex space-x-2">
