@@ -26,6 +26,14 @@ const Index = () => {
               <h1 className="text-2xl font-bold text-gray-900">Retail Reach Radar</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.href = '/auth'}
+                className="text-sm"
+              >
+                Agent Sign In
+              </Button>
               <div className="flex bg-gray-100 rounded-lg p-1">
                 <Button
                   variant={userRole === 'agent' ? 'default' : 'ghost'}
