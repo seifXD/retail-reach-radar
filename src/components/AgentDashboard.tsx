@@ -77,20 +77,21 @@ const AgentDashboard = () => {
         <CardContent>
           <div className="space-y-4">
             {[
-              { name: "Premium Electronics Store", priority: "High", credit: "$15,000", lastCall: "3 days ago", notes: "Interested in new product line" },
-              { name: "City Hardware Depot", priority: "Medium", credit: "$8,500", lastCall: "1 week ago", notes: "Payment issues resolved" },
-              { name: "Downtown Furniture Co.", priority: "High", credit: "$22,000", lastCall: "2 days ago", notes: "Ready to place large order" },
-              { name: "Garden Center Plus", priority: "Low", credit: "$3,200", lastCall: "5 days ago", notes: "Seasonal buyer - follow up in spring" }
+              { ownerName: "Michael Thompson", storeName: "Premium Electronics Store", priority: "High", credit: "$15,000", lastCall: "3 days ago", notes: "Interested in new product line" },
+              { ownerName: "Sarah Rodriguez", storeName: "City Hardware Depot", priority: "Medium", credit: "$8,500", lastCall: "1 week ago", notes: "Payment issues resolved" },
+              { ownerName: "David Chen", storeName: "Downtown Furniture Co.", priority: "High", credit: "$22,000", lastCall: "2 days ago", notes: "Ready to place large order" },
+              { ownerName: "Lisa Johnson", storeName: "Garden Center Plus", priority: "Low", credit: "$3,200", lastCall: "5 days ago", notes: "Seasonal buyer - follow up in spring" }
             ].map((retailer, index) => (
               <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center space-x-3">
-                    <h3 className="font-medium text-gray-900">{retailer.name}</h3>
+                    <h3 className="font-medium text-gray-900">{retailer.ownerName}</h3>
                     <Badge variant={retailer.priority === "High" ? "destructive" : retailer.priority === "Medium" ? "default" : "secondary"}>
                       {retailer.priority}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-6 text-sm text-gray-600">
+                    <span>Store: {retailer.storeName}</span>
                     <span>Credit: {retailer.credit}</span>
                     <span>Last call: {retailer.lastCall}</span>
                   </div>
