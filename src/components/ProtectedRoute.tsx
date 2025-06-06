@@ -9,10 +9,7 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
 
-  // Temporarily bypass authentication - remove this when you have credentials
-  const BYPASS_AUTH = true;
-
-  if (loading && !BYPASS_AUTH) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
@@ -23,7 +20,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     );
   }
 
-  if (!user && !BYPASS_AUTH) {
+  if (!user) {
     return <AuthPage />;
   }
 

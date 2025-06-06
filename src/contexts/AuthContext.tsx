@@ -7,7 +7,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signIn: (agentId: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, userData: { full_name: string, role: 'agent' | 'supervisor' }) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -46,10 +47,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (agentId: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
-      email: `${agentId}@retailreach.com`,
+      email,
       password,
+    });
+    return { error };
+  };
+
+  const signUp = async (email: string, password: string, userData: { full_name: string, role: 'agent' | 'supervisor' }) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: userData,
+        emailRedirectTo: `${window.location.origin}/`
+      }
     });
     return { error };
   };
@@ -63,6 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     loading,
     signIn,
+    signUp,
     signOut,
   };
 

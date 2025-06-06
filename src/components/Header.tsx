@@ -13,6 +13,14 @@ const Header: React.FC<HeaderProps> = ({ userRole }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
+  const getUserRole = () => {
+    return user?.user_metadata?.role || 'agent';
+  };
+
+  const getUserName = () => {
+    return user?.user_metadata?.full_name || user?.email || 'User';
+  };
+
   return (
     <header className="bg-white shadow-sm border-b">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -28,7 +36,7 @@ const Header: React.FC<HeaderProps> = ({ userRole }) => {
             {user && (
               <>
                 <span className="text-sm text-gray-600">
-                  Welcome, {user.user_metadata?.full_name || user.user_metadata?.agent_id || 'Agent'}
+                  Welcome, {getUserName()} ({getUserRole()})
                 </span>
                 <div className="flex bg-gray-100 rounded-lg p-1">
                   <Button
@@ -36,6 +44,7 @@ const Header: React.FC<HeaderProps> = ({ userRole }) => {
                     size="sm"
                     onClick={() => navigate('/agent')}
                     className="text-sm"
+                    disabled={getUserRole() === 'supervisor' && userRole === 'agent'}
                   >
                     Agent View
                   </Button>
