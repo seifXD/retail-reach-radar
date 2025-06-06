@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Phone, LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,10 +18,11 @@ const Header: React.FC<HeaderProps> = ({ userRole }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-4">
-            <div className="bg-blue-600 p-2 rounded-lg">
-              <Phone className="h-6 w-6 text-white" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900">Retail Reach Radar</h1>
+            <img 
+              src="/lovable-uploads/112b426a-382f-426a-baed-c1b99f0ce5e8.png" 
+              alt="Maxab Logo" 
+              className="h-10 w-auto"
+            />
           </div>
           <div className="flex items-center space-x-4">
             {user && (
