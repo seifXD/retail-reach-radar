@@ -2,14 +2,16 @@
 import { Button } from "@/components/ui/button";
 import { Phone, LogOut } from "lucide-react";
 import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 interface HeaderProps {
   userRole: 'agent' | 'supervisor';
   setUserRole: (role: 'agent' | 'supervisor') => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ userRole, setUserRole }) => {
+const Header: React.FC<HeaderProps> = ({ userRole }) => {
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -31,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ userRole, setUserRole }) => {
                   <Button
                     variant={userRole === 'agent' ? 'default' : 'ghost'}
                     size="sm"
-                    onClick={() => setUserRole('agent')}
+                    onClick={() => navigate('/agent')}
                     className="text-sm"
                   >
                     Agent View
@@ -39,7 +41,7 @@ const Header: React.FC<HeaderProps> = ({ userRole, setUserRole }) => {
                   <Button
                     variant={userRole === 'supervisor' ? 'default' : 'ghost'}
                     size="sm"
-                    onClick={() => setUserRole('supervisor')}
+                    onClick={() => navigate('/supervisor')}
                     className="text-sm"
                   >
                     Supervisor View
