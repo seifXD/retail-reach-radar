@@ -1,12 +1,32 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Phone, Mail, CreditCard, FileText, Plus } from "lucide-react";
+import { Search, Phone, Mail, CreditCard, FileText, Plus, Calendar, DollarSign } from "lucide-react";
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from "@/hooks/use-toast";
+
+interface Retailer {
+  id: string;
+  retailer_id: string;
+  name: string;
+  mobile?: string;
+  sales_order_id?: string;
+  project_name?: string;
+  description?: string;
+  last_recharge_date?: string;
+  preferred_collection_method?: string;
+  solde?: number;
+  agent_id?: string;
+  last_call_date?: string;
+  created_at: string;
+  added_at: string;
+}
 
 interface RetailerProfilesProps {
   userRole: 'agent' | 'supervisor';
@@ -14,75 +34,101 @@ interface RetailerProfilesProps {
 
 const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRetailer, setSelectedRetailer] = useState<any>(null);
+  const [selectedRetailer, setSelectedRetailer] = useState<Retailer | null>(null);
+  const [retailers, setRetailers] = useState<Retailer[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newNote, setNewNote] = useState('');
+  const { user } = useAuth();
+  const { toast } = useToast();
 
-  const retailers = [
-    {
-      id: 1,
-      name: "John Smith",
-      contact: "John Smith",
-      phone: "+1 (555) 123-4567",
-      email: "john@premiumelectronics.com",
-      creditLimit: 15000,
-      currentCredit: 12500,
-      lastCall: "2023-12-15",
-      status: "Active",
-      priority: "High",
-      notes: [
-        { date: "2023-12-15", agent: "Sarah", note: "Interested in new product line. Follow up next week." },
-        { date: "2023-12-10", agent: "Mike", note: "Payment received. Credit restored." }
-      ],
-      callHistory: [
-        { date: "2023-12-15", outcome: "Interested", duration: "5:23" },
-        { date: "2023-12-10", outcome: "Payment Discussion", duration: "3:45" }
-      ]
-    },
-    {
-      id: 2,
-      name: "Maria Garcia",
-      contact: "Maria Garcia",
-      phone: "+1 (555) 234-5678",
-      email: "maria@cityhardware.com",
-      creditLimit: 8500,
-      currentCredit: 6200,
-      lastCall: "2023-12-12",
-      status: "Active",
-      priority: "Medium",
-      notes: [
-        { date: "2023-12-12", agent: "Emma", note: "Requested catalog for spring season." },
-        { date: "2023-12-08", agent: "Sarah", note: "Slow payer but reliable. Good relationship." }
-      ],
-      callHistory: [
-        { date: "2023-12-12", outcome: "Follow-up", duration: "4:12" },
-        { date: "2023-12-08", outcome: "Catalog Request", duration: "2:56" }
-      ]
-    },
-    {
-      id: 3,
-      name: "Robert Johnson",
-      contact: "Robert Johnson",
-      phone: "+1 (555) 345-6789",
-      email: "robert@dtfurniture.com",
-      creditLimit: 22000,
-      currentCredit: 18750,
-      lastCall: "2023-12-14",
-      status: "Active",
-      priority: "High",
-      notes: [
-        { date: "2023-12-14", agent: "Lisa", note: "Ready to place large order. Waiting for final approval." },
-        { date: "2023-12-11", agent: "Tom", note: "Discussed new furniture line. Very interested." }
-      ],
-      callHistory: [
-        { date: "2023-12-14", outcome: "Order Pending", duration: "7:18" },
-        { date: "2023-12-11", outcome: "Product Discussion", duration: "6:02" }
-      ]
+  const fetchRetailers = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('retailers')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching retailers:', error);
+        toast({
+          title: "Error",
+          description: "Failed to fetch retailers",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setRetailers(data || []);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const updateLastCallDate = async (retailerId: string) => {
+    try {
+      const { error } = await supabase
+        .from('retailers')
+        .update({ last_call_date: new Date().toISOString() })
+        .eq('id', retailerId);
+
+      if (error) {
+        console.error('Error updating last call date:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update call date",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "Call date updated successfully",
+      });
+
+      fetchRetailers();
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchRetailers();
+  }, []);
 
   const filteredRetailers = retailers.filter(retailer =>
     retailer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    retailer.contact.toLowerCase().includes(searchTerm.toLowerCase())
+    retailer.retailer_id.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Never';
+    return new Date(dateString).toLocaleDateString();
+  };
+
+  const formatCurrency = (amount?: number) => {
+    if (amount === null || amount === undefined) return 'N/A';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center p-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -97,7 +143,7 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search retailers by name or contact..."
+                placeholder="Search retailers by name or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -120,145 +166,172 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">{retailer.name}</CardTitle>
-                <Badge variant={retailer.priority === "High" ? "destructive" : retailer.priority === "Medium" ? "default" : "secondary"}>
-                  {retailer.priority}
+                <Badge variant="outline">
+                  ID: {retailer.retailer_id}
                 </Badge>
               </div>
-              <CardDescription>{retailer.contact}</CardDescription>
+              <CardDescription>{retailer.project_name || 'No project assigned'}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
+                {retailer.mobile && (
+                  <div className="flex items-center space-x-2 text-sm">
+                    <Phone className="h-4 w-4 text-gray-500" />
+                    <span>{retailer.mobile}</span>
+                  </div>
+                )}
+                {retailer.sales_order_id && (
+                  <div className="flex items-center space-x-2 text-sm">
+                    <FileText className="h-4 w-4 text-gray-500" />
+                    <span>Order: {retailer.sales_order_id}</span>
+                  </div>
+                )}
                 <div className="flex items-center space-x-2 text-sm">
-                  <Phone className="h-4 w-4 text-gray-500" />
-                  <span>{retailer.phone}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <Mail className="h-4 w-4 text-gray-500" />
-                  <span>{retailer.email}</span>
-                </div>
-                <div className="flex items-center space-x-2 text-sm">
-                  <CreditCard className="h-4 w-4 text-gray-500" />
-                  <span>Credit: ${retailer.currentCredit.toLocaleString()} / ${retailer.creditLimit.toLocaleString()}</span>
+                  <DollarSign className="h-4 w-4 text-gray-500" />
+                  <span>Balance: {formatCurrency(retailer.solde)}</span>
                 </div>
               </div>
               
               <div className="bg-gray-50 p-3 rounded-lg">
-                <p className="text-sm text-gray-600">Last Call: {retailer.lastCall}</p>
-                <p className="text-sm font-medium mt-1">{retailer.notes[0]?.note}</p>
+                <p className="text-sm text-gray-600">Last Call: {formatDate(retailer.last_call_date)}</p>
+                <p className="text-sm text-gray-600">Last Recharge: {formatDate(retailer.last_recharge_date)}</p>
+                {retailer.description && (
+                  <p className="text-sm font-medium mt-1">{retailer.description}</p>
+                )}
               </div>
 
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button className="w-full" onClick={() => setSelectedRetailer(retailer)}>
-                    <FileText className="h-4 w-4 mr-2" />
-                    View Full Profile
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle>{retailer.name} - Full Profile</DialogTitle>
-                  </DialogHeader>
-                  
-                  {selectedRetailer && (
-                    <div className="space-y-6">
-                      {/* Contact Info */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-lg">Contact Information</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Contact Person</label>
-                            <p className="text-lg">{selectedRetailer.contact}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Phone</label>
-                            <p className="text-lg">{selectedRetailer.phone}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Email</label>
-                            <p className="text-lg">{selectedRetailer.email}</p>
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium text-gray-600">Status</label>
-                            <Badge className="mt-1">{selectedRetailer.status}</Badge>
-                          </div>
-                        </CardContent>
-                      </Card>
-
-                      {/* Credit Information */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-lg">Credit Information</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="grid grid-cols-2 gap-4">
+              <div className="flex space-x-2">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="flex-1" onClick={() => setSelectedRetailer(retailer)}>
+                      <FileText className="h-4 w-4 mr-2" />
+                      View Profile
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>{retailer.name} - Full Profile</DialogTitle>
+                    </DialogHeader>
+                    
+                    {selectedRetailer && (
+                      <div className="space-y-6">
+                        {/* Contact Info */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Contact Information</CardTitle>
+                          </CardHeader>
+                          <CardContent className="grid grid-cols-2 gap-4">
                             <div>
-                              <label className="text-sm font-medium text-gray-600">Credit Limit</label>
-                              <p className="text-2xl font-bold text-green-600">${selectedRetailer.creditLimit.toLocaleString()}</p>
+                              <label className="text-sm font-medium text-gray-600">Retailer ID</label>
+                              <p className="text-lg">{selectedRetailer.retailer_id}</p>
                             </div>
                             <div>
-                              <label className="text-sm font-medium text-gray-600">Available Credit</label>
-                              <p className="text-2xl font-bold text-blue-600">${selectedRetailer.currentCredit.toLocaleString()}</p>
+                              <label className="text-sm font-medium text-gray-600">Mobile</label>
+                              <p className="text-lg">{selectedRetailer.mobile || 'Not provided'}</p>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                            <div>
+                              <label className="text-sm font-medium text-gray-600">Project</label>
+                              <p className="text-lg">{selectedRetailer.project_name || 'Not assigned'}</p>
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium text-gray-600">Sales Order ID</label>
+                              <p className="text-lg">{selectedRetailer.sales_order_id || 'Not provided'}</p>
+                            </div>
+                          </CardContent>
+                        </Card>
 
-                      {/* Notes History */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-lg">Notes & History</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-4">
-                            {selectedRetailer.notes.map((note: any, index: number) => (
-                              <div key={index} className="bg-gray-50 p-4 rounded-lg">
+                        {/* Financial Information */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Financial Information</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <label className="text-sm font-medium text-gray-600">Current Balance</label>
+                                <p className="text-2xl font-bold text-blue-600">{formatCurrency(selectedRetailer.solde)}</p>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium text-gray-600">Collection Method</label>
+                                <p className="text-lg">{selectedRetailer.preferred_collection_method || 'Not specified'}</p>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+
+                        {/* Activity Log */}
+                        <Card>
+                          <CardHeader>
+                            <CardTitle className="text-lg">Activity Log</CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <div className="bg-gray-50 p-4 rounded-lg">
                                 <div className="flex justify-between items-center mb-2">
-                                  <span className="font-medium">{note.agent}</span>
-                                  <span className="text-sm text-gray-500">{note.date}</span>
+                                  <span className="font-medium">Last Call Date</span>
+                                  <span className="text-sm text-gray-500">{formatDate(selectedRetailer.last_call_date)}</span>
                                 </div>
-                                <p className="text-gray-700">{note.note}</p>
                               </div>
-                            ))}
-                            <div className="mt-4">
-                              <Textarea placeholder="Add a new note..." className="mb-2" />
-                              <Button size="sm">Add Note</Button>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="font-medium">Last Recharge Date</span>
+                                  <span className="text-sm text-gray-500">{formatDate(selectedRetailer.last_recharge_date)}</span>
+                                </div>
+                              </div>
+                              <div className="bg-gray-50 p-4 rounded-lg">
+                                <div className="flex justify-between items-center mb-2">
+                                  <span className="font-medium">Added to System</span>
+                                  <span className="text-sm text-gray-500">{formatDate(selectedRetailer.added_at)}</span>
+                                </div>
+                              </div>
+                              
+                              {selectedRetailer.description && (
+                                <div className="bg-blue-50 p-4 rounded-lg">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <span className="font-medium">Description</span>
+                                  </div>
+                                  <p className="text-gray-700">{selectedRetailer.description}</p>
+                                </div>
+                              )}
 
-                      {/* Call History */}
-                      <Card>
-                        <CardHeader>
-                          <CardTitle className="text-lg">Call History</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-3">
-                            {selectedRetailer.callHistory.map((call: any, index: number) => (
-                              <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <div>
-                                  <p className="font-medium">{call.outcome}</p>
-                                  <p className="text-sm text-gray-500">{call.date}</p>
-                                </div>
-                                <div className="text-right">
-                                  <p className="text-sm font-medium">{call.duration}</p>
-                                  <p className="text-xs text-gray-500">Duration</p>
+                              <div className="mt-4 space-y-2">
+                                <Textarea 
+                                  placeholder="Add a note about this retailer..." 
+                                  value={newNote}
+                                  onChange={(e) => setNewNote(e.target.value)}
+                                />
+                                <div className="flex space-x-2">
+                                  <Button size="sm" disabled>Add Note</Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="outline"
+                                    onClick={() => updateLastCallDate(selectedRetailer.id)}
+                                  >
+                                    <Calendar className="h-4 w-4 mr-1" />
+                                    Mark as Called
+                                  </Button>
                                 </div>
                               </div>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  )}
-                </DialogContent>
-              </Dialog>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    )}
+                  </DialogContent>
+                </Dialog>
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {filteredRetailers.length === 0 && !loading && (
+        <Card>
+          <CardContent className="text-center py-8">
+            <p className="text-gray-500">No retailers found matching your search.</p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

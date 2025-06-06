@@ -9,13 +9,98 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id: string
+          role: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          role?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      retailers: {
+        Row: {
+          added_at: string
+          agent_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          last_call_date: string | null
+          last_recharge_date: string | null
+          mobile: string | null
+          name: string
+          preferred_collection_method: string | null
+          project_name: string | null
+          retailer_id: string
+          sales_order_id: string | null
+          solde: number | null
+        }
+        Insert: {
+          added_at?: string
+          agent_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_call_date?: string | null
+          last_recharge_date?: string | null
+          mobile?: string | null
+          name: string
+          preferred_collection_method?: string | null
+          project_name?: string | null
+          retailer_id: string
+          sales_order_id?: string | null
+          solde?: number | null
+        }
+        Update: {
+          added_at?: string
+          agent_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          last_call_date?: string | null
+          last_recharge_date?: string | null
+          mobile?: string | null
+          name?: string
+          preferred_collection_method?: string | null
+          project_name?: string | null
+          retailer_id?: string
+          sales_order_id?: string | null
+          solde?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retailers_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
