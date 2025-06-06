@@ -1,61 +1,21 @@
 
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Phone, Target, TrendingUp, Calendar, Settings } from "lucide-react";
+import { Users, Phone, Target, TrendingUp } from "lucide-react";
 import AgentDashboard from "@/components/AgentDashboard";
 import SupervisorDashboard from "@/components/SupervisorDashboard";
 import RetailerProfiles from "@/components/RetailerProfiles";
 import TaskManagement from "@/components/TaskManagement";
+import Header from "@/components/Header";
 
 const Index = () => {
   const [userRole, setUserRole] = useState<'agent' | 'supervisor'>('agent');
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <div className="bg-blue-600 p-2 rounded-lg">
-                <Phone className="h-6 w-6 text-white" />
-              </div>
-              <h1 className="text-2xl font-bold text-gray-900">Retail Reach Radar</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.location.href = '/auth'}
-                className="text-sm"
-              >
-                Agent Sign In
-              </Button>
-              <div className="flex bg-gray-100 rounded-lg p-1">
-                <Button
-                  variant={userRole === 'agent' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setUserRole('agent')}
-                  className="text-sm"
-                >
-                  Agent View
-                </Button>
-                <Button
-                  variant={userRole === 'supervisor' ? 'default' : 'ghost'}
-                  size="sm"
-                  onClick={() => setUserRole('supervisor')}
-                  className="text-sm"
-                >
-                  Supervisor View
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header userRole={userRole} setUserRole={setUserRole} />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
