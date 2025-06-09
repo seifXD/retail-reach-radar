@@ -92,6 +92,77 @@ export type Database = {
           },
         ]
       }
+      retailers_enhanced: {
+        Row: {
+          added_at: string
+          agent_assigned: string | null
+          agent_id: string | null
+          commentaire: string | null
+          created_at: string
+          description: string | null
+          id: string
+          inserted_at: string
+          last_call_date: string | null
+          last_recharge_date: string | null
+          mobile: string | null
+          name: string
+          preferred_collection_method: string | null
+          priority: string | null
+          project_name: string | null
+          retailer_id: string
+          sales_order_id: string | null
+          solde: number | null
+        }
+        Insert: {
+          added_at?: string
+          agent_assigned?: string | null
+          agent_id?: string | null
+          commentaire?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          inserted_at?: string
+          last_call_date?: string | null
+          last_recharge_date?: string | null
+          mobile?: string | null
+          name: string
+          preferred_collection_method?: string | null
+          priority?: string | null
+          project_name?: string | null
+          retailer_id: string
+          sales_order_id?: string | null
+          solde?: number | null
+        }
+        Update: {
+          added_at?: string
+          agent_assigned?: string | null
+          agent_id?: string | null
+          commentaire?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          inserted_at?: string
+          last_call_date?: string | null
+          last_recharge_date?: string | null
+          mobile?: string | null
+          name?: string
+          preferred_collection_method?: string | null
+          priority?: string | null
+          project_name?: string | null
+          retailer_id?: string
+          sales_order_id?: string | null
+          solde?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "retailers_enhanced_agent_id_fkey"
+            columns: ["agent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
