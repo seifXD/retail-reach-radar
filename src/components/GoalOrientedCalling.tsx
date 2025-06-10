@@ -164,7 +164,7 @@ const GoalOrientedCalling = () => {
                 <span>Progress</span>
                 <span>{formatCurrency(currentProgress)} / {formatCurrency(rechargeGoal)}</span>
               </div>
-              <Progress value={progressPercentage} className="h-2 bg-blue-800" />
+              <Progress value={progressPercentage} className="h-3 bg-blue-800" />
             </div>
 
             <div className="grid grid-cols-2 gap-3 pt-2">
