@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Search, Phone, Target, DollarSign, TrendingUp, Filter, Trophy, Zap } from "lucide-react";
+import { Search, Phone, Target, DollarSign, TrendingUp, Filter } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 interface Retailer {
   id: string;
@@ -139,24 +138,8 @@ const GoalOrientedCalling = () => {
   const progressPercentage = (currentProgress / rechargeGoal) * 100;
   const remaining = rechargeGoal - currentProgress;
 
-  // Data for visualizations
-  const progressData = [
-    { name: 'Completed', value: currentProgress, color: '#10b981' },
-    { name: 'Remaining', value: remaining, color: '#e5e7eb' }
-  ];
-
-  const weeklyData = [
-    { day: 'Mon', amount: 2500 },
-    { day: 'Tue', amount: 3200 },
-    { day: 'Wed', amount: 1800 },
-    { day: 'Thu', amount: 2900 },
-    { day: 'Fri', amount: 2100 },
-    { day: 'Sat', amount: 0 },
-    { day: 'Sun', amount: 0 }
-  ];
-
-  const CircularProgress = ({ percentage, size = 120 }: { percentage: number; size?: number }) => {
-    const radius = size / 2 - 10;
+  const CircularProgress = ({ percentage, size = 80 }: { percentage: number; size?: number }) => {
+    const radius = size / 2 - 6;
     const circumference = 2 * Math.PI * radius;
     const strokeDasharray = circumference;
     const strokeDashoffset = circumference - (percentage / 100) * circumference;
@@ -169,27 +152,26 @@ const GoalOrientedCalling = () => {
             cy={size / 2}
             r={radius}
             stroke="currentColor"
-            strokeWidth="8"
+            strokeWidth="4"
             fill="transparent"
-            className="text-gray-200"
+            className="text-muted"
           />
           <circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
             stroke="currentColor"
-            strokeWidth="8"
+            strokeWidth="4"
             fill="transparent"
             strokeDasharray={strokeDasharray}
             strokeDashoffset={strokeDashoffset}
-            className="text-blue-500 transition-all duration-300 ease-in-out"
+            className="text-primary transition-all duration-300 ease-in-out"
             strokeLinecap="round"
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{percentage.toFixed(1)}%</div>
-            <div className="text-xs text-gray-500">Complete</div>
+            <div className="text-lg font-semibold">{percentage.toFixed(0)}%</div>
           </div>
         </div>
       </div>
@@ -199,125 +181,58 @@ const GoalOrientedCalling = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Hero Section with Goal Progress */}
-      <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white overflow-hidden">
-        <CardContent className="p-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-            <div className="space-y-4">
+      {/* Compact Target Quest Section */}
+      <Card className="border-primary/20">
+        <CardContent className="p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+            <div className="space-y-3">
               <div className="flex items-center space-x-2">
-                <Target className="h-8 w-8" />
-                <h2 className="text-3xl font-bold">Target Quest</h2>
+                <Target className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold">Monthly Target</h3>
               </div>
-              <p className="text-blue-100 text-lg">Your mission: Reach {formatCurrency(rechargeGoal)} in recharges this month</p>
+              <p className="text-muted-foreground text-sm">
+                Reach {formatCurrency(rechargeGoal)} in recharges
+              </p>
               
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Progress</span>
-                  <span>{formatCurrency(currentProgress)} / {formatCurrency(rechargeGoal)}</span>
+                  <span className="font-medium">{formatCurrency(currentProgress)}</span>
                 </div>
-                <Progress value={progressPercentage} className="h-3 bg-blue-800" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 pt-4">
-                <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                  <div className="flex items-center space-x-2">
-                    <TrendingUp className="h-5 w-5 text-green-300" />
-                    <span className="text-sm text-blue-100">Achieved</span>
-                  </div>
-                  <div className="text-2xl font-bold">{formatCurrency(currentProgress)}</div>
-                </div>
-                <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                  <div className="flex items-center space-x-2">
-                    <Zap className="h-5 w-5 text-orange-300" />
-                    <span className="text-sm text-blue-100">Remaining</span>
-                  </div>
-                  <div className="text-2xl font-bold">{formatCurrency(remaining)}</div>
-                </div>
+                <Progress value={progressPercentage} className="h-2" />
               </div>
             </div>
 
-            <div className="flex justify-center">
-              <CircularProgress percentage={progressPercentage} size={160} />
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
+                <div className="flex items-center justify-center space-x-1 mb-1">
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                  <span className="text-xs text-muted-foreground">Achieved</span>
+                </div>
+                <div className="text-sm font-semibold">{formatCurrency(currentProgress)}</div>
+              </div>
+              <div className="bg-muted/50 rounded-lg p-3 text-center">
+                <div className="flex items-center justify-center space-x-1 mb-1">
+                  <DollarSign className="h-4 w-4 text-orange-600" />
+                  <span className="text-xs text-muted-foreground">Remaining</span>
+                </div>
+                <div className="text-sm font-semibold">{formatCurrency(remaining)}</div>
+              </div>
+            </div>
+
+            <div className="flex justify-center lg:justify-end">
+              <CircularProgress percentage={progressPercentage} />
             </div>
           </div>
         </CardContent>
       </Card>
-
-      {/* Analytics Dashboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Progress Breakdown */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Trophy className="h-5 w-5 text-yellow-500" />
-              <span>Goal Breakdown</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={progressData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    dataKey="value"
-                    startAngle={90}
-                    endAngle={450}
-                  >
-                    {progressData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex justify-center space-x-6 mt-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Completed</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
-                <span className="text-sm text-gray-600">Remaining</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Weekly Performance */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-blue-500" />
-              <span>Weekly Performance</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                  <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Retailers Section */}
       <Card>
