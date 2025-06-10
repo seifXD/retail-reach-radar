@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -59,12 +58,16 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
     }
   };
 
-  const getOutcomeVariant = (outcome: string) => {
+  const getOutcomeStyles = (outcome: string) => {
     switch (outcome) {
-      case "Reachable": return "default";
-      case "Unreachable": return "destructive";
-      case "Not Interested": return "secondary";
-      default: return "outline";
+      case "Reachable": 
+        return "bg-green-500 text-white hover:bg-green-600 border-green-500 px-3 py-1 text-sm font-semibold";
+      case "Unreachable": 
+        return "bg-red-500 text-white hover:bg-red-600 border-red-500 px-3 py-1 text-sm font-semibold";
+      case "Not Interested": 
+        return "bg-yellow-500 text-white hover:bg-yellow-600 border-yellow-500 px-3 py-1 text-sm font-semibold";
+      default: 
+        return "bg-gray-500 text-white hover:bg-gray-600 border-gray-500 px-3 py-1 text-sm font-semibold";
     }
   };
 
@@ -81,9 +84,9 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
             {task.status}
           </Badge>
           {task.outcome && (
-            <Badge variant={getOutcomeVariant(task.outcome)}>
+            <div className={`inline-flex items-center rounded-full border ${getOutcomeStyles(task.outcome)}`}>
               {task.outcome}
-            </Badge>
+            </div>
           )}
         </div>
         <div className="flex items-center space-x-6 text-sm text-gray-600">
@@ -126,7 +129,7 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
                 Unreachable
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Not Interested')}>
-                <Clock className="h-4 w-4 mr-2 text-gray-600" />
+                <Clock className="h-4 w-4 mr-2 text-yellow-600" />
                 Not Interested
               </DropdownMenuItem>
             </DropdownMenuContent>
