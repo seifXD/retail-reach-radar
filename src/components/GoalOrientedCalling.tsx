@@ -138,46 +138,6 @@ const GoalOrientedCalling = () => {
   const progressPercentage = (currentProgress / rechargeGoal) * 100;
   const remaining = rechargeGoal - currentProgress;
 
-  const CircularProgress = ({ percentage, size = 80 }: { percentage: number; size?: number }) => {
-    const radius = size / 2 - 6;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDasharray = circumference;
-    const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-    return (
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} className="transform -rotate-90">
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="transparent"
-            className="text-muted"
-          />
-          <circle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke="currentColor"
-            strokeWidth="4"
-            fill="transparent"
-            strokeDasharray={strokeDasharray}
-            strokeDashoffset={strokeDashoffset}
-            className="text-primary transition-all duration-300 ease-in-out"
-            strokeLinecap="round"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-lg font-semibold">{percentage.toFixed(0)}%</div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -191,7 +151,7 @@ const GoalOrientedCalling = () => {
       {/* Compact Target Quest Section */}
       <Card className="border-primary/20">
         <CardContent className="p-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
             <div className="space-y-3">
               <div className="flex items-center space-x-2">
                 <Target className="h-5 w-5 text-primary" />
@@ -225,10 +185,6 @@ const GoalOrientedCalling = () => {
                 </div>
                 <div className="text-sm font-semibold">{formatCurrency(remaining)}</div>
               </div>
-            </div>
-
-            <div className="flex justify-center lg:justify-end">
-              <CircularProgress percentage={progressPercentage} />
             </div>
           </div>
         </CardContent>
