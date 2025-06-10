@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Phone, Target, TrendingUp, Lock } from "lucide-react";
+import { Users, Phone, Target, TrendingUp, Lock, Crosshair } from "lucide-react";
 import AgentDashboard from "@/components/AgentDashboard";
 import AssignedTasks from "@/components/AssignedTasks";
 import GoalOrientedCalling from "@/components/GoalOrientedCalling";
@@ -81,8 +81,8 @@ const AgentPage = () => {
               disabled={hasUncompletedTasks}
             >
               {hasUncompletedTasks && <Lock className="h-4 w-4" />}
-              <Phone className="h-4 w-4" />
-              <span>Goal Calling</span>
+              <Crosshair className="h-4 w-4" />
+              <span>Target Quest</span>
             </TabsTrigger>
             <TabsTrigger value="call-history" className="flex items-center space-x-2">
               <Phone className="h-4 w-4" />
@@ -106,7 +106,7 @@ const AgentPage = () => {
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Complete Assigned Tasks First</h3>
                   <p className="text-gray-600">
                     You have {uncompletedTasks.length} uncompleted assigned task(s). 
-                    Please complete them before accessing goal-oriented calling.
+                    Please complete them before accessing Target Quest.
                   </p>
                 </CardContent>
               </Card>
