@@ -61,13 +61,13 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
   const getOutcomeStyles = (outcome: string) => {
     switch (outcome) {
       case "Reachable": 
-        return "bg-green-500 text-white hover:bg-green-600 border-green-500 px-3 py-1 text-sm font-semibold";
+        return "bg-green-500 text-white hover:bg-green-600 border-green-500 px-2.5 py-0.5 text-xs font-semibold";
       case "Unreachable": 
-        return "bg-red-500 text-white hover:bg-red-600 border-red-500 px-3 py-1 text-sm font-semibold";
+        return "bg-red-500 text-white hover:bg-red-600 border-red-500 px-2.5 py-0.5 text-xs font-semibold";
       case "Not Interested": 
-        return "bg-yellow-500 text-white hover:bg-yellow-600 border-yellow-500 px-3 py-1 text-sm font-semibold";
+        return "bg-yellow-500 text-white hover:bg-yellow-600 border-yellow-500 px-2.5 py-0.5 text-xs font-semibold";
       default: 
-        return "bg-gray-500 text-white hover:bg-gray-600 border-gray-500 px-3 py-1 text-sm font-semibold";
+        return "bg-gray-500 text-white hover:bg-gray-600 border-gray-500 px-2.5 py-0.5 text-xs font-semibold";
     }
   };
 
