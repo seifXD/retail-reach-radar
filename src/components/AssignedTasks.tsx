@@ -1,9 +1,9 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Phone, Calendar, User, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Phone, Calendar, User, CheckCircle, Clock, AlertCircle, ChevronDown } from "lucide-react";
 
 interface Task {
   id: number;
@@ -25,9 +25,9 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
   const completedTasks = tasks.filter(task => task.status === 'Completed');
   const uncompletedTasks = tasks.filter(task => task.status !== 'Completed');
 
-  const markAsCompleted = (taskId: number) => {
+  const markAsCompleted = (taskId: number, outcome: string) => {
     const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, status: 'Completed' as const } : task
+      task.id === taskId ? { ...task, status: 'Completed' as const, outcome } : task
     );
     onTasksUpdate(updatedTasks);
   };
@@ -93,12 +93,28 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
             <Phone className="h-4 w-4 mr-2" />
             Call Now
           </Button>
-          <Button 
-            size="sm"
-            onClick={() => markAsCompleted(task.id)}
-          >
-            Mark Complete
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm">
+                Mark Complete
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Reachable')}>
+                <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                Reachable
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Unreachable')}>
+                <AlertCircle className="h-4 w-4 mr-2 text-red-600" />
+                Unreachable
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Not Interested')}>
+                <Clock className="h-4 w-4 mr-2 text-gray-600" />
+                Not Interested
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
     </div>

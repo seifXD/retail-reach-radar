@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +8,20 @@ import AssignedTasks from "@/components/AssignedTasks";
 import GoalOrientedCalling from "@/components/GoalOrientedCalling";
 import Header from "@/components/Header";
 
+interface Task {
+  id: number;
+  retailerName: string;
+  retailerId: string;
+  priority: "High" | "Medium" | "Low";
+  dueDate: string;
+  status: "Pending" | "In Progress" | "Completed";
+  taskType: string;
+  description: string;
+}
+
 const AgentPage = () => {
   // Mock data for assigned tasks - in real app this would come from database
-  const [assignedTasks, setAssignedTasks] = useState([
+  const [assignedTasks, setAssignedTasks] = useState<Task[]>([
     {
       id: 1,
       retailerName: "Michael Thompson",
