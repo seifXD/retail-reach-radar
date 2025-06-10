@@ -10,10 +10,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from "@/hooks/use-toast";
 
-interface RetailerEnhanced {
+interface Retailer {
   id: string;
   added_at: string;
-  agent_assigned?: string;
   retailer_id: string;
   name: string;
   mobile?: string;
@@ -26,9 +25,6 @@ interface RetailerEnhanced {
   solde?: number;
   agent_id?: string;
   last_call_date?: string;
-  priority?: string;
-  commentaire?: string;
-  inserted_at: string;
 }
 
 interface RetailersTableProps {
@@ -37,7 +33,7 @@ interface RetailersTableProps {
 
 const RetailersTable = ({ userRole }: RetailersTableProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [retailers, setRetailers] = useState<RetailerEnhanced[]>([]);
+  const [retailers, setRetailers] = useState<Retailer[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const { toast } = useToast();
@@ -46,7 +42,7 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('retailers_enhanced')
+        .from('retailers')
         .select('*')
         .order('added_at', { ascending: false });
 
@@ -76,7 +72,7 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
   const updateLastCallDate = async (retailerId: string) => {
     try {
       const { error } = await supabase
-        .from('retailers_enhanced')
+        .from('retailers')
         .update({ last_call_date: new Date().toISOString() })
         .eq('id', retailerId);
 
@@ -123,15 +119,6 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
     }).format(amount);
   };
 
-  const getPriorityBadgeVariant = (priority?: string) => {
-    switch (priority) {
-      case 'High': return 'destructive';
-      case 'Medium': return 'secondary';
-      case 'Low': return 'outline';
-      default: return 'outline';
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -145,8 +132,8 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
       {/* Search and Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Enhanced Retailer Database</CardTitle>
-          <CardDescription>Comprehensive retailer management with priority and task assignment</CardDescription>
+          <CardTitle>Retailer Database</CardTitle>
+          <CardDescription>Manage your retailer contacts and information</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex space-x-4">
@@ -177,7 +164,6 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Added At</TableHead>
-                  <TableHead>Agent Assigned</TableHead>
                   <TableHead>Retailer ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Mobile</TableHead>
@@ -187,8 +173,6 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
                   <TableHead>Collection Method</TableHead>
                   <TableHead>Balance</TableHead>
                   <TableHead>Last Call</TableHead>
-                  <TableHead>Priority</TableHead>
-                  <TableHead>Comment</TableHead>
                   <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -196,7 +180,6 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
                 {filteredRetailers.map((retailer) => (
                   <TableRow key={retailer.id}>
                     <TableCell className="text-sm">{formatDate(retailer.added_at)}</TableCell>
-                    <TableCell className="text-sm">{retailer.agent_assigned || 'Unassigned'}</TableCell>
                     <TableCell className="font-medium">{retailer.retailer_id}</TableCell>
                     <TableCell className="font-medium">{retailer.name}</TableCell>
                     <TableCell className="text-sm">{retailer.mobile || 'N/A'}</TableCell>
@@ -206,16 +189,6 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
                     <TableCell className="text-sm">{retailer.preferred_collection_method || 'N/A'}</TableCell>
                     <TableCell className="text-sm font-medium">{formatCurrency(retailer.solde)}</TableCell>
                     <TableCell className="text-sm">{formatDate(retailer.last_call_date)}</TableCell>
-                    <TableCell>
-                      {retailer.priority && (
-                        <Badge variant={getPriorityBadgeVariant(retailer.priority)}>
-                          {retailer.priority}
-                        </Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-sm max-w-[200px] truncate">
-                      {retailer.commentaire || 'N/A'}
-                    </TableCell>
                     <TableCell>
                       <div className="flex space-x-1">
                         <Button 
