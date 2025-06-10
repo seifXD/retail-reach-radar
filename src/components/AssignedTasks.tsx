@@ -71,7 +71,7 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
     }
   };
 
-  const TaskCard = ({ task, showActions = true }: { task: Task; showActions?: boolean }) => (
+  const TaskCard = ({ task, showActions = true, showStatusBadge = true }: { task: Task; showActions?: boolean; showStatusBadge?: boolean }) => (
     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
       <div className="flex-1 space-y-2">
         <div className="flex items-center space-x-3">
@@ -80,9 +80,11 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
           <Badge variant={getPriorityVariant(task.priority)}>
             {task.priority}
           </Badge>
-          <Badge variant="outline">
-            {task.status}
-          </Badge>
+          {showStatusBadge && (
+            <Badge variant="outline">
+              {task.status}
+            </Badge>
+          )}
           {task.outcome && (
             <div className={`inline-flex items-center rounded-full border ${getOutcomeStyles(task.outcome)}`}>
               {task.outcome}
@@ -213,7 +215,7 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
               <div className="space-y-4">
                 {completedTasks.length > 0 ? (
                   completedTasks.map((task) => (
-                    <TaskCard key={task.id} task={task} showActions={false} />
+                    <TaskCard key={task.id} task={task} showActions={false} showStatusBadge={false} />
                   ))
                 ) : (
                   <div className="text-center py-8">
