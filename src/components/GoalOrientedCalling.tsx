@@ -1,4 +1,5 @@
 
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -150,36 +151,36 @@ const GoalOrientedCalling = () => {
     <div className="space-y-6">
       {/* Hero Section with Goal Progress */}
       <Card className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 text-white overflow-hidden">
-        <CardContent className="p-8">
-          <div className="space-y-4">
+        <CardContent className="p-6">
+          <div className="space-y-3">
             <div className="flex items-center space-x-2">
-              <Target className="h-8 w-8" />
-              <h2 className="text-3xl font-bold">Target Quest</h2>
+              <Target className="h-6 w-6" />
+              <h2 className="text-2xl font-bold">Target Quest</h2>
             </div>
-            <p className="text-blue-100 text-lg">Your mission: Reach {formatCurrency(rechargeGoal)} in recharges this month</p>
+            <p className="text-blue-100">Your mission: Reach {formatCurrency(rechargeGoal)} in recharges this month</p>
             
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Progress</span>
                 <span>{formatCurrency(currentProgress)} / {formatCurrency(rechargeGoal)}</span>
               </div>
-              <Progress value={progressPercentage} className="h-3 bg-blue-800" />
+              <Progress value={progressPercentage} className="h-2 bg-blue-800" />
             </div>
 
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
                 <div className="flex items-center space-x-2">
-                  <TrendingUp className="h-5 w-5 text-green-300" />
-                  <span className="text-sm text-blue-100">Achieved</span>
+                  <TrendingUp className="h-4 w-4 text-green-300" />
+                  <span className="text-xs text-blue-100">Achieved</span>
                 </div>
-                <div className="text-2xl font-bold">{formatCurrency(currentProgress)}</div>
+                <div className="text-lg font-bold">{formatCurrency(currentProgress)}</div>
               </div>
-              <div className="bg-white/10 rounded-lg p-4 backdrop-blur-sm">
+              <div className="bg-white/10 rounded-lg p-3 backdrop-blur-sm">
                 <div className="flex items-center space-x-2">
-                  <Zap className="h-5 w-5 text-orange-300" />
-                  <span className="text-sm text-blue-100">Remaining</span>
+                  <Zap className="h-4 w-4 text-orange-300" />
+                  <span className="text-xs text-blue-100">Remaining</span>
                 </div>
-                <div className="text-2xl font-bold">{formatCurrency(remaining)}</div>
+                <div className="text-lg font-bold">{formatCurrency(remaining)}</div>
               </div>
             </div>
           </div>
@@ -267,3 +268,4 @@ const GoalOrientedCalling = () => {
 };
 
 export default GoalOrientedCalling;
+
