@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,28 +18,25 @@ interface Task {
 
 interface AssignedTasksProps {
   tasks: Task[];
+  onTasksUpdate: (tasks: Task[]) => void;
 }
 
-const AssignedTasks = ({ tasks }: AssignedTasksProps) => {
-  const [taskList, setTaskList] = useState(tasks);
-
-  const completedTasks = taskList.filter(task => task.status === 'Completed');
-  const uncompletedTasks = taskList.filter(task => task.status !== 'Completed');
+const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
+  const completedTasks = tasks.filter(task => task.status === 'Completed');
+  const uncompletedTasks = tasks.filter(task => task.status !== 'Completed');
 
   const markAsCompleted = (taskId: number) => {
-    setTaskList(prevTasks => 
-      prevTasks.map(task => 
-        task.id === taskId ? { ...task, status: 'Completed' as const } : task
-      )
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, status: 'Completed' as const } : task
     );
+    onTasksUpdate(updatedTasks);
   };
 
   const markAsCalled = (taskId: number) => {
-    setTaskList(prevTasks => 
-      prevTasks.map(task => 
-        task.id === taskId ? { ...task, status: 'In Progress' as const } : task
-      )
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, status: 'In Progress' as const } : task
     );
+    onTasksUpdate(updatedTasks);
   };
 
   const getPriorityVariant = (priority: string) => {
@@ -118,7 +114,7 @@ const AssignedTasks = ({ tasks }: AssignedTasksProps) => {
             <AlertCircle className="h-4 w-4" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{taskList.length}</div>
+            <div className="text-2xl font-bold">{tasks.length}</div>
           </CardContent>
         </Card>
         

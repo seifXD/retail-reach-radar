@@ -11,7 +11,7 @@ import Header from "@/components/Header";
 
 const AgentPage = () => {
   // Mock data for assigned tasks - in real app this would come from database
-  const assignedTasks = [
+  const [assignedTasks, setAssignedTasks] = useState([
     {
       id: 1,
       retailerName: "Michael Thompson",
@@ -42,7 +42,7 @@ const AgentPage = () => {
       taskType: "Order processing",
       description: "Process and confirm large furniture order. Verify inventory."
     }
-  ];
+  ]);
 
   const uncompletedTasks = assignedTasks.filter(task => task.status !== 'Completed');
   const hasUncompletedTasks = uncompletedTasks.length > 0;
@@ -83,7 +83,7 @@ const AgentPage = () => {
           </TabsContent>
 
           <TabsContent value="assigned-tasks">
-            <AssignedTasks tasks={assignedTasks} />
+            <AssignedTasks tasks={assignedTasks} onTasksUpdate={setAssignedTasks} />
           </TabsContent>
 
           <TabsContent value="goal-calling">
