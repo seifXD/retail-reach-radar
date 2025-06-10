@@ -44,24 +44,31 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
   const fetchRetailers = async () => {
     try {
       setLoading(true);
+      console.log('Fetching retailers from table: retailers');
+      console.log('Current user:', user);
+      
       const { data, error } = await supabase
         .from('retailers')
         .select('*')
         .order('created_at', { ascending: false });
 
+      console.log('Supabase response - data:', data);
+      console.log('Supabase response - error:', error);
+
       if (error) {
         console.error('Error fetching retailers:', error);
         toast({
           title: "Error",
-          description: "Failed to fetch retailers",
+          description: `Failed to fetch retailers: ${error.message}`,
           variant: "destructive",
         });
         return;
       }
 
+      console.log('Number of retailers fetched:', data?.length || 0);
       setRetailers(data || []);
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Unexpected error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -132,6 +139,20 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
 
   return (
     <div className="space-y-6">
+      {/* Debug Info */}
+      <Card>
+        <CardContent className="p-4">
+          <p className="text-sm text-gray-600">
+            Debug: Found {retailers.length} retailers total, showing {filteredRetailers.length} after search filter
+          </p>
+          {retailers.length > 0 && (
+            <div className="mt-2 text-xs text-gray-500">
+              <p>Sample retailer: {retailers[0]?.name} (ID: {retailers[0]?.retailer_id})</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Search and Filters */}
       <Card>
         <CardHeader>
@@ -328,7 +349,20 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
       {filteredRetailers.length === 0 && !loading && (
         <Card>
           <CardContent className="text-center py-8">
-            <p className="text-gray-500">No retailers found matching your search.</p>
+            <p className="text-gray-500">
+              {retailers.length === 0 
+                ? "No retailers found in database." 
+                : "No retailers found matching your search."}
+            </p>
+            {retailers.length === 0 && (
+              <Button 
+                onClick={fetchRetailers} 
+                className="mt-4"
+                variant="outline"
+              >
+                Refresh Data
+              </Button>
+            )}
           </CardContent>
         </Card>
       )}
