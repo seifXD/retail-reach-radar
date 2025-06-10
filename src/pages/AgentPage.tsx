@@ -1,14 +1,52 @@
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Phone, Target, TrendingUp } from "lucide-react";
+import { Users, Phone, Target, TrendingUp, Lock } from "lucide-react";
 import AgentDashboard from "@/components/AgentDashboard";
-import RetailerProfiles from "@/components/RetailerProfiles";
-import TaskManagement from "@/components/TaskManagement";
+import AssignedTasks from "@/components/AssignedTasks";
+import GoalOrientedCalling from "@/components/GoalOrientedCalling";
 import Header from "@/components/Header";
 
 const AgentPage = () => {
+  // Mock data for assigned tasks - in real app this would come from database
+  const assignedTasks = [
+    {
+      id: 1,
+      retailerName: "Michael Thompson",
+      retailerId: "RT001",
+      priority: "High",
+      dueDate: "2023-12-16",
+      status: "In Progress",
+      taskType: "Follow-up call",
+      description: "Follow up on product line interest. Prepare proposal."
+    },
+    {
+      id: 2,
+      retailerName: "Sarah Rodriguez", 
+      retailerId: "RT002",
+      priority: "Medium",
+      dueDate: "2023-12-17",
+      status: "Pending",
+      taskType: "Credit review",
+      description: "Review payment history and adjust credit terms if needed."
+    },
+    {
+      id: 3,
+      retailerName: "David Chen",
+      retailerId: "RT003", 
+      priority: "High",
+      dueDate: "2023-12-15",
+      status: "Completed",
+      taskType: "Order processing",
+      description: "Process and confirm large furniture order. Verify inventory."
+    }
+  ];
+
+  const uncompletedTasks = assignedTasks.filter(task => task.status !== 'Completed');
+  const hasUncompletedTasks = uncompletedTasks.length > 0;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Header userRole="agent" setUserRole={() => {}} />
@@ -21,17 +59,22 @@ const AgentPage = () => {
               <TrendingUp className="h-4 w-4" />
               <span>Dashboard</span>
             </TabsTrigger>
-            <TabsTrigger value="retailers" className="flex items-center space-x-2">
-              <Users className="h-4 w-4" />
-              <span>Retailers</span>
-            </TabsTrigger>
-            <TabsTrigger value="tasks" className="flex items-center space-x-2">
+            <TabsTrigger value="assigned-tasks" className="flex items-center space-x-2">
               <Target className="h-4 w-4" />
-              <span>Tasks</span>
+              <span>Assigned Tasks</span>
             </TabsTrigger>
-            <TabsTrigger value="calls" className="flex items-center space-x-2">
+            <TabsTrigger 
+              value="goal-calling" 
+              className="flex items-center space-x-2"
+              disabled={hasUncompletedTasks}
+            >
+              {hasUncompletedTasks && <Lock className="h-4 w-4" />}
               <Phone className="h-4 w-4" />
-              <span>Call Log</span>
+              <span>Goal Calling</span>
+            </TabsTrigger>
+            <TabsTrigger value="call-history" className="flex items-center space-x-2">
+              <Phone className="h-4 w-4" />
+              <span>Call History</span>
             </TabsTrigger>
           </TabsList>
 
@@ -39,15 +82,28 @@ const AgentPage = () => {
             <AgentDashboard />
           </TabsContent>
 
-          <TabsContent value="retailers">
-            <RetailerProfiles userRole="agent" />
+          <TabsContent value="assigned-tasks">
+            <AssignedTasks tasks={assignedTasks} />
           </TabsContent>
 
-          <TabsContent value="tasks">
-            <TaskManagement userRole="agent" />
+          <TabsContent value="goal-calling">
+            {hasUncompletedTasks ? (
+              <Card>
+                <CardContent className="text-center py-8">
+                  <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Complete Assigned Tasks First</h3>
+                  <p className="text-gray-600">
+                    You have {uncompletedTasks.length} uncompleted assigned task(s). 
+                    Please complete them before accessing goal-oriented calling.
+                  </p>
+                </CardContent>
+              </Card>
+            ) : (
+              <GoalOrientedCalling />
+            )}
           </TabsContent>
 
-          <TabsContent value="calls">
+          <TabsContent value="call-history">
             <Card>
               <CardHeader>
                 <CardTitle>Call History</CardTitle>
