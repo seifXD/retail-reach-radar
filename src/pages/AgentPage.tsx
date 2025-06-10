@@ -1,9 +1,8 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Phone, Target, TrendingUp, Lock, Crosshair } from "lucide-react";
+import { Users, Phone, Target, TrendingUp, Lock, Flag } from "lucide-react";
 import AgentDashboard from "@/components/AgentDashboard";
 import AssignedTasks from "@/components/AssignedTasks";
 import GoalOrientedCalling from "@/components/GoalOrientedCalling";
@@ -81,7 +80,7 @@ const AgentPage = () => {
               disabled={hasUncompletedTasks}
             >
               {hasUncompletedTasks && <Lock className="h-4 w-4" />}
-              <Crosshair className="h-4 w-4" />
+              <Flag className="h-4 w-4" />
               <span>Target Quest</span>
             </TabsTrigger>
             <TabsTrigger value="call-history" className="flex items-center space-x-2">
