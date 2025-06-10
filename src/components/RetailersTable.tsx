@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -167,7 +166,6 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
                   <TableHead>Retailer ID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Mobile</TableHead>
-                  <TableHead>Sales Order ID</TableHead>
                   <TableHead>Project Name</TableHead>
                   <TableHead>Last Recharge</TableHead>
                   <TableHead>Collection Method</TableHead>
@@ -183,7 +181,6 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
                     <TableCell className="font-medium">{retailer.retailer_id}</TableCell>
                     <TableCell className="font-medium">{retailer.name}</TableCell>
                     <TableCell className="text-sm">{retailer.mobile || 'N/A'}</TableCell>
-                    <TableCell className="text-sm">{retailer.sales_order_id || 'N/A'}</TableCell>
                     <TableCell className="text-sm">{retailer.project_name || 'N/A'}</TableCell>
                     <TableCell className="text-sm">{formatDate(retailer.last_recharge_date)}</TableCell>
                     <TableCell className="text-sm">{retailer.preferred_collection_method || 'N/A'}</TableCell>

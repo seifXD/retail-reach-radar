@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -181,12 +180,10 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
                     <span>{retailer.mobile}</span>
                   </div>
                 )}
-                {retailer.sales_order_id && (
-                  <div className="flex items-center space-x-2 text-sm">
-                    <FileText className="h-4 w-4 text-gray-500" />
-                    <span>Order: {retailer.sales_order_id}</span>
-                  </div>
-                )}
+                <div className="flex items-center space-x-2 text-sm">
+                  <FileText className="h-4 w-4 text-gray-500" />
+                  <span>ID: {retailer.retailer_id}</span>
+                </div>
                 <div className="flex items-center space-x-2 text-sm">
                   <DollarSign className="h-4 w-4 text-gray-500" />
                   <span>Balance: {formatCurrency(retailer.solde)}</span>
@@ -233,10 +230,6 @@ const RetailerProfiles = ({ userRole }: RetailerProfilesProps) => {
                             <div>
                               <label className="text-sm font-medium text-gray-600">Project</label>
                               <p className="text-lg">{selectedRetailer.project_name || 'Not assigned'}</p>
-                            </div>
-                            <div>
-                              <label className="text-sm font-medium text-gray-600">Sales Order ID</label>
-                              <p className="text-lg">{selectedRetailer.sales_order_id || 'Not provided'}</p>
                             </div>
                           </CardContent>
                         </Card>
