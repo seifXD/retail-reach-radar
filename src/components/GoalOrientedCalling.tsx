@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Search, Phone, Target, DollarSign, TrendingUp, Filter, Trophy, Zap } from "lucide-react";
+import { Search, Phone, Target, TrendingUp, Filter, Zap } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 
 interface Retailer {
   id: string;
@@ -138,22 +138,6 @@ const GoalOrientedCalling = () => {
   const progressPercentage = (currentProgress / rechargeGoal) * 100;
   const remaining = rechargeGoal - currentProgress;
 
-  // Data for visualizations
-  const progressData = [
-    { name: 'Completed', value: currentProgress, color: '#10b981' },
-    { name: 'Remaining', value: remaining, color: '#e5e7eb' }
-  ];
-
-  const weeklyData = [
-    { day: 'Mon', amount: 2500 },
-    { day: 'Tue', amount: 3200 },
-    { day: 'Wed', amount: 1800 },
-    { day: 'Thu', amount: 2900 },
-    { day: 'Fri', amount: 2100 },
-    { day: 'Sat', amount: 0 },
-    { day: 'Sun', amount: 0 }
-  ];
-
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -201,75 +185,6 @@ const GoalOrientedCalling = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Analytics Dashboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Progress Breakdown */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Trophy className="h-5 w-5 text-yellow-500" />
-              <span>Goal Breakdown</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={progressData}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={60}
-                    outerRadius={100}
-                    dataKey="value"
-                    startAngle={90}
-                    endAngle={450}
-                  >
-                    {progressData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex justify-center space-x-6 mt-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">Completed</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
-                <span className="text-sm text-gray-600">Remaining</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Weekly Performance */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <TrendingUp className="h-5 w-5 text-blue-500" />
-              <span>Weekly Performance</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={weeklyData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="day" />
-                  <YAxis />
-                  <Tooltip formatter={(value: number) => formatCurrency(value)} />
-                  <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Retailers Section */}
       <Card>
