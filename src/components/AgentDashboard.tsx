@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -10,6 +11,13 @@ const AgentDashboard = () => {
     successfulCalls: 8,
     tasksCompleted: 5,
     totalTasks: 12
+  };
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'EGP'
+    }).format(amount);
   };
 
   return (
@@ -76,10 +84,10 @@ const AgentDashboard = () => {
         <CardContent>
           <div className="space-y-4">
             {[
-              { ownerName: "Michael Thompson", priority: "High", credit: "$15,000", lastCall: "3 days ago", notes: "Interested in new product line" },
-              { ownerName: "Sarah Rodriguez", priority: "Medium", credit: "$8,500", lastCall: "1 week ago", notes: "Payment issues resolved" },
-              { ownerName: "David Chen", priority: "High", credit: "$22,000", lastCall: "2 days ago", notes: "Ready to place large order" },
-              { ownerName: "Lisa Johnson", priority: "Low", credit: "$3,200", lastCall: "5 days ago", notes: "Seasonal buyer - follow up in spring" }
+              { ownerName: "Michael Thompson", priority: "High", credit: 15000, lastCall: "3 days ago", notes: "Interested in new product line" },
+              { ownerName: "Sarah Rodriguez", priority: "Medium", credit: 8500, lastCall: "1 week ago", notes: "Payment issues resolved" },
+              { ownerName: "David Chen", priority: "High", credit: 22000, lastCall: "2 days ago", notes: "Ready to place large order" },
+              { ownerName: "Lisa Johnson", priority: "Low", credit: 3200, lastCall: "5 days ago", notes: "Seasonal buyer - follow up in spring" }
             ].map((retailer, index) => (
               <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <div className="flex-1 space-y-2">
@@ -90,7 +98,7 @@ const AgentDashboard = () => {
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-6 text-sm text-gray-600">
-                    <span>Credit: {retailer.credit}</span>
+                    <span>Credit: {formatCurrency(retailer.credit)}</span>
                     <span>Last call: {retailer.lastCall}</span>
                   </div>
                   <p className="text-sm text-gray-700">{retailer.notes}</p>
