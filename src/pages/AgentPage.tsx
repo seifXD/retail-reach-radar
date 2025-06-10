@@ -2,10 +2,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Phone, Target, TrendingUp, Table } from "lucide-react";
+import { Users, Phone, Target, TrendingUp } from "lucide-react";
 import AgentDashboard from "@/components/AgentDashboard";
 import RetailerProfiles from "@/components/RetailerProfiles";
-import RetailersTable from "@/components/RetailersTable";
 import TaskManagement from "@/components/TaskManagement";
 import Header from "@/components/Header";
 
@@ -17,7 +16,7 @@ const AgentPage = () => {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 bg-white shadow-sm">
+          <TabsList className="grid w-full grid-cols-4 bg-white shadow-sm">
             <TabsTrigger value="dashboard" className="flex items-center space-x-2">
               <TrendingUp className="h-4 w-4" />
               <span>Dashboard</span>
@@ -25,10 +24,6 @@ const AgentPage = () => {
             <TabsTrigger value="retailers" className="flex items-center space-x-2">
               <Users className="h-4 w-4" />
               <span>Retailers</span>
-            </TabsTrigger>
-            <TabsTrigger value="retailers-table" className="flex items-center space-x-2">
-              <Table className="h-4 w-4" />
-              <span>Enhanced Table</span>
             </TabsTrigger>
             <TabsTrigger value="tasks" className="flex items-center space-x-2">
               <Target className="h-4 w-4" />
@@ -46,10 +41,6 @@ const AgentPage = () => {
 
           <TabsContent value="retailers">
             <RetailerProfiles userRole="agent" />
-          </TabsContent>
-
-          <TabsContent value="retailers-table">
-            <RetailersTable userRole="agent" />
           </TabsContent>
 
           <TabsContent value="tasks">
