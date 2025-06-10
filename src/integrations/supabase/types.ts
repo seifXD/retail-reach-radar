@@ -94,64 +94,64 @@ export type Database = {
       }
       retailers_enhanced: {
         Row: {
-          added_at: string
-          agent_assigned: string | null
+          "Added at": string
+          Agent_assigned: string | null
           agent_id: string | null
-          commentaire: string | null
-          created_at: string
-          description: string | null
+          Commentaire: string | null
+          "Created at": string
+          Description: string | null
           id: string
           inserted_at: string
-          last_call_date: string | null
-          last_recharge_date: string | null
-          mobile: string | null
-          name: string
-          preferred_collection_method: string | null
-          priority: string | null
-          project_name: string | null
-          retailer_id: string
-          sales_order_id: string | null
-          solde: number | null
+          "Last Call Date": string | null
+          "Last Recharge Date": string | null
+          Mobile: string | null
+          Name: string
+          "Preferred Collection Method": string | null
+          Priority: string | null
+          "Project Name": string | null
+          "Retailer ID": string
+          "Sales Order ID": string | null
+          Solde: number | null
         }
         Insert: {
-          added_at?: string
-          agent_assigned?: string | null
+          "Added at"?: string
+          Agent_assigned?: string | null
           agent_id?: string | null
-          commentaire?: string | null
-          created_at?: string
-          description?: string | null
+          Commentaire?: string | null
+          "Created at"?: string
+          Description?: string | null
           id?: string
           inserted_at?: string
-          last_call_date?: string | null
-          last_recharge_date?: string | null
-          mobile?: string | null
-          name: string
-          preferred_collection_method?: string | null
-          priority?: string | null
-          project_name?: string | null
-          retailer_id: string
-          sales_order_id?: string | null
-          solde?: number | null
+          "Last Call Date"?: string | null
+          "Last Recharge Date"?: string | null
+          Mobile?: string | null
+          Name: string
+          "Preferred Collection Method"?: string | null
+          Priority?: string | null
+          "Project Name"?: string | null
+          "Retailer ID": string
+          "Sales Order ID"?: string | null
+          Solde?: number | null
         }
         Update: {
-          added_at?: string
-          agent_assigned?: string | null
+          "Added at"?: string
+          Agent_assigned?: string | null
           agent_id?: string | null
-          commentaire?: string | null
-          created_at?: string
-          description?: string | null
+          Commentaire?: string | null
+          "Created at"?: string
+          Description?: string | null
           id?: string
           inserted_at?: string
-          last_call_date?: string | null
-          last_recharge_date?: string | null
-          mobile?: string | null
-          name?: string
-          preferred_collection_method?: string | null
-          priority?: string | null
-          project_name?: string | null
-          retailer_id?: string
-          sales_order_id?: string | null
-          solde?: number | null
+          "Last Call Date"?: string | null
+          "Last Recharge Date"?: string | null
+          Mobile?: string | null
+          Name?: string
+          "Preferred Collection Method"?: string | null
+          Priority?: string | null
+          "Project Name"?: string | null
+          "Retailer ID"?: string
+          "Sales Order ID"?: string | null
+          Solde?: number | null
         }
         Relationships: [
           {
