@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ interface Task {
   status: "Pending" | "In Progress" | "Completed";
   taskType: string;
   description: string;
+  outcome?: string;
 }
 
 interface AssignedTasksProps {
@@ -57,6 +59,15 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
     }
   };
 
+  const getOutcomeVariant = (outcome: string) => {
+    switch (outcome) {
+      case "Reachable": return "default";
+      case "Unreachable": return "destructive";
+      case "Not Interested": return "secondary";
+      default: return "outline";
+    }
+  };
+
   const TaskCard = ({ task, showActions = true }: { task: Task; showActions?: boolean }) => (
     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
       <div className="flex-1 space-y-2">
@@ -69,6 +80,11 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
           <Badge variant="outline">
             {task.status}
           </Badge>
+          {task.outcome && (
+            <Badge variant={getOutcomeVariant(task.outcome)}>
+              {task.outcome}
+            </Badge>
+          )}
         </div>
         <div className="flex items-center space-x-6 text-sm text-gray-600">
           <div className="flex items-center space-x-1">

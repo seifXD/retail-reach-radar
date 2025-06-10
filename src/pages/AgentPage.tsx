@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +18,7 @@ interface Task {
   status: "Pending" | "In Progress" | "Completed";
   taskType: string;
   description: string;
+  outcome?: string;
 }
 
 const AgentPage = () => {
