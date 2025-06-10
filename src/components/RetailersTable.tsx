@@ -113,7 +113,7 @@ const RetailersTable = ({ userRole }: RetailersTableProps) => {
 
   const formatCurrency = (amount?: number) => {
     if (amount === null || amount === undefined) return 'N/A';
-    return new Intl.NumberFormat('ar-EG', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'EGP'
     }).format(amount);
