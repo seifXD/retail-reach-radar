@@ -16,9 +16,9 @@ const AgentPage = () => {
       id: 1,
       retailerName: "Michael Thompson",
       retailerId: "RT001",
-      priority: "High",
+      priority: "High" as const,
       dueDate: "2023-12-16",
-      status: "In Progress",
+      status: "In Progress" as const,
       taskType: "Follow-up call",
       description: "Follow up on product line interest. Prepare proposal."
     },
@@ -26,9 +26,9 @@ const AgentPage = () => {
       id: 2,
       retailerName: "Sarah Rodriguez", 
       retailerId: "RT002",
-      priority: "Medium",
+      priority: "Medium" as const,
       dueDate: "2023-12-17",
-      status: "Pending",
+      status: "Pending" as const,
       taskType: "Credit review",
       description: "Review payment history and adjust credit terms if needed."
     },
@@ -36,9 +36,9 @@ const AgentPage = () => {
       id: 3,
       retailerName: "David Chen",
       retailerId: "RT003", 
-      priority: "High",
+      priority: "High" as const,
       dueDate: "2023-12-15",
-      status: "Completed",
+      status: "Completed" as const,
       taskType: "Order processing",
       description: "Process and confirm large furniture order. Verify inventory."
     }
