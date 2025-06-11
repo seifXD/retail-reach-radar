@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Phone, Target, Clock, TrendingUp } from "lucide-react";
+import { Phone, Target, Clock, TrendingUp, Users } from "lucide-react";
 
 const AgentDashboard = () => {
   const todayStats = {
@@ -19,6 +19,41 @@ const AgentDashboard = () => {
       currency: 'EGP'
     }).format(amount);
   };
+
+  const tasks = [
+    {
+      name: "POS acquisition",
+      priority: "High",
+      retailersCount: 15,
+      completedCalls: 3,
+      description: "Contact retailers for new POS device acquisition",
+      deadline: "Today"
+    },
+    {
+      name: "Etisalat cash",
+      priority: "Medium",
+      retailersCount: 8,
+      completedCalls: 2,
+      description: "Follow up on Etisalat cash service integration",
+      deadline: "Tomorrow"
+    },
+    {
+      name: "POS follow up",
+      priority: "High",
+      retailersCount: 12,
+      completedCalls: 5,
+      description: "Follow up with existing POS users for support",
+      deadline: "Today"
+    },
+    {
+      name: "App retention",
+      priority: "Low",
+      retailersCount: 6,
+      completedCalls: 1,
+      description: "Re-engage retailers who stopped using the app",
+      deadline: "This week"
+    }
+  ];
 
   return (
     <div className="space-y-6">
@@ -79,33 +114,38 @@ const AgentDashboard = () => {
       <Card>
         <CardHeader>
           <CardTitle>Today's Assigned Tasks</CardTitle>
-          <CardDescription>Retailers you need to contact today</CardDescription>
+          <CardDescription>Tasks you need to complete today</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[
-              { ownerName: "Michael Thompson", priority: "High", credit: 15000, lastCall: "3 days ago", notes: "Interested in new product line" },
-              { ownerName: "Sarah Rodriguez", priority: "Medium", credit: 8500, lastCall: "1 week ago", notes: "Payment issues resolved" },
-              { ownerName: "David Chen", priority: "High", credit: 22000, lastCall: "2 days ago", notes: "Ready to place large order" },
-              { ownerName: "Lisa Johnson", priority: "Low", credit: 3200, lastCall: "5 days ago", notes: "Seasonal buyer - follow up in spring" }
-            ].map((retailer, index) => (
+            {tasks.map((task, index) => (
               <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center space-x-3">
-                    <h3 className="font-medium text-gray-900">{retailer.ownerName}</h3>
-                    <Badge variant={retailer.priority === "High" ? "destructive" : retailer.priority === "Medium" ? "default" : "secondary"}>
-                      {retailer.priority}
+                    <h3 className="font-medium text-gray-900">{task.name}</h3>
+                    <Badge variant={task.priority === "High" ? "destructive" : task.priority === "Medium" ? "default" : "secondary"}>
+                      {task.priority}
                     </Badge>
                   </div>
                   <div className="flex items-center space-x-6 text-sm text-gray-600">
-                    <span>Credit: {formatCurrency(retailer.credit)}</span>
-                    <span>Last call: {retailer.lastCall}</span>
+                    <span className="flex items-center space-x-1">
+                      <Users className="h-4 w-4" />
+                      <span>{task.retailersCount} retailers</span>
+                    </span>
+                    <span>Progress: {task.completedCalls}/{task.retailersCount} calls</span>
+                    <span>Due: {task.deadline}</span>
                   </div>
-                  <p className="text-sm text-gray-700">{retailer.notes}</p>
+                  <p className="text-sm text-gray-700">{task.description}</p>
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-blue-600 h-2 rounded-full" 
+                      style={{ width: `${(task.completedCalls / task.retailersCount) * 100}%` }}
+                    ></div>
+                  </div>
                 </div>
                 <Button size="sm" className="ml-4">
                   <Phone className="h-4 w-4 mr-2" />
-                  Call Now
+                  Start Task
                 </Button>
               </div>
             ))}
