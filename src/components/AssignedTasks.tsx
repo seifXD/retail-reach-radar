@@ -1,11 +1,9 @@
-
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Phone, Clock, Target, MessageSquare } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Phone, Calendar, User, CheckCircle, Clock, AlertCircle, ChevronDown } from "lucide-react";
 
 interface Task {
   id: number;
@@ -24,38 +22,25 @@ interface AssignedTasksProps {
   onTasksUpdate: (tasks: Task[]) => void;
 }
 
-const AssignedTasks: React.FC<AssignedTasksProps> = ({ tasks, onTasksUpdate }) => {
-  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
-  const [comment, setComment] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
+  const completedTasks = tasks.filter(task => task.status === 'Completed');
+  const uncompletedTasks = tasks.filter(task => task.status !== 'Completed');
 
-  const handleStartTask = (taskId: number) => {
-    const updatedTasks = tasks.map(task =>
-      task.id === taskId ? { ...task, status: "In Progress" as const } : task
+  const markAsCompleted = (taskId: number, outcome: string) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, status: 'Completed' as const, outcome } : task
     );
     onTasksUpdate(updatedTasks);
   };
 
-  const handleCompleteTask = () => {
-    if (selectedTaskId === null) return;
-    
-    const updatedTasks = tasks.map(task =>
-      task.id === selectedTaskId 
-        ? { ...task, status: "Completed" as const, outcome: comment }
-        : task
+  const markAsCalled = (taskId: number) => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, status: 'In Progress' as const } : task
     );
     onTasksUpdate(updatedTasks);
-    setComment("");
-    setSelectedTaskId(null);
-    setIsDialogOpen(false);
   };
 
-  const openCompleteDialog = (taskId: number) => {
-    setSelectedTaskId(taskId);
-    setIsDialogOpen(true);
-  };
-
-  const getPriorityColor = (priority: string) => {
+  const getPriorityVariant = (priority: string) => {
     switch (priority) {
       case "High": return "destructive";
       case "Medium": return "default";
@@ -64,158 +49,184 @@ const AssignedTasks: React.FC<AssignedTasksProps> = ({ tasks, onTasksUpdate }) =
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusIcon = (status: string) => {
     switch (status) {
-      case "Completed": return "bg-green-100 text-green-800";
-      case "In Progress": return "bg-blue-100 text-blue-800";
-      case "Pending": return "bg-orange-100 text-orange-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "Completed": return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case "In Progress": return <Clock className="h-4 w-4 text-blue-600" />;
+      case "Pending": return <AlertCircle className="h-4 w-4 text-orange-600" />;
+      default: return <AlertCircle className="h-4 w-4 text-gray-600" />;
     }
   };
 
+  const getOutcomeStyles = (outcome: string) => {
+    switch (outcome) {
+      case "Reachable": 
+        return "bg-green-500 text-white hover:bg-green-600 border-green-500 px-2.5 py-0.5 text-xs font-semibold";
+      case "Unreachable": 
+        return "bg-red-500 text-white hover:bg-red-600 border-red-500 px-2.5 py-0.5 text-xs font-semibold";
+      case "Not Interested": 
+        return "bg-yellow-500 text-white hover:bg-yellow-600 border-yellow-500 px-2.5 py-0.5 text-xs font-semibold";
+      default: 
+        return "bg-gray-500 text-white hover:bg-gray-600 border-gray-500 px-2.5 py-0.5 text-xs font-semibold";
+    }
+  };
+
+  const TaskCard = ({ task, showActions = true, showStatusBadge = true }: { task: Task; showActions?: boolean; showStatusBadge?: boolean }) => (
+    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+      <div className="flex-1 space-y-2">
+        <div className="flex items-center space-x-3">
+          {getStatusIcon(task.status)}
+          <h3 className="font-medium text-gray-900">{task.retailerName}</h3>
+          <Badge variant={getPriorityVariant(task.priority)}>
+            {task.priority}
+          </Badge>
+          {showStatusBadge && (
+            <Badge variant="outline">
+              {task.status}
+            </Badge>
+          )}
+          {task.outcome && (
+            <div className={`inline-flex items-center rounded-full border ${getOutcomeStyles(task.outcome)}`}>
+              {task.outcome}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center space-x-6 text-sm text-gray-600">
+          <div className="flex items-center space-x-1">
+            <User className="h-4 w-4" />
+            <span>ID: {task.retailerId}</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Calendar className="h-4 w-4" />
+            <span>Due: {task.dueDate}</span>
+          </div>
+        </div>
+        <p className="text-sm text-gray-700 font-medium">{task.taskType}</p>
+        <p className="text-sm text-gray-600">{task.description}</p>
+      </div>
+      {showActions && task.status !== 'Completed' && (
+        <div className="flex space-x-2 ml-4">
+          <Button 
+            size="sm" 
+            variant="outline"
+            onClick={() => markAsCalled(task.id)}
+          >
+            <Phone className="h-4 w-4 mr-2" />
+            Call Now
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button size="sm">
+                Mark Complete
+                <ChevronDown className="h-4 w-4 ml-2" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-48">
+              <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Reachable')}>
+                <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                Reachable
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Unreachable')}>
+                <AlertCircle className="h-4 w-4 mr-2 text-red-600" />
+                Unreachable
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Not Interested')}>
+                <Clock className="h-4 w-4 mr-2 text-yellow-600" />
+                Not Interested
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <div className="space-y-6">
+      {/* Overview Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-gradient-to-r from-blue-500 to-blue-600 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
+            <AlertCircle className="h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{tasks.length}</div>
+          </CardContent>
+        </Card>
+        
+        <Card className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Pending Tasks</CardTitle>
+            <Clock className="h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{uncompletedTasks.length}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-r from-green-500 to-green-600 text-white">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Completed Today</CardTitle>
+            <CheckCircle className="h-4 w-4" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{completedTasks.length}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tasks Tabs */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Target className="h-5 w-5" />
-            <span>Assigned Tasks</span>
-          </CardTitle>
-          <CardDescription>
-            Complete your assigned tasks to unlock Target Quest
-          </CardDescription>
+          <CardTitle>Assigned Tasks</CardTitle>
+          <CardDescription>Tasks assigned to you by your supervisor</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {tasks.map((task) => (
-              <div key={task.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center space-x-3">
-                      <h3 className="font-semibold text-lg">{task.retailerName}</h3>
-                      <Badge variant={getPriorityColor(task.priority)}>
-                        {task.priority}
-                      </Badge>
-                      <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(task.status)}`}>
-                        {task.status}
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium">Retailer ID:</span>
-                        <span>{task.retailerId}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Clock className="h-4 w-4" />
-                        <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-medium">Type:</span>
-                        <span>{task.taskType}</span>
-                      </div>
-                    </div>
-                    
-                    <p className="text-gray-700">{task.description}</p>
-                    
-                    {task.outcome && (
-                      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <MessageSquare className="h-4 w-4 text-green-600" />
-                          <span className="text-sm font-medium text-green-800">Call Outcome:</span>
-                        </div>
-                        <p className="text-sm text-green-700">{task.outcome}</p>
-                      </div>
-                    )}
+          <Tabs defaultValue="uncompleted" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="uncompleted" className="flex items-center space-x-2">
+                <Clock className="h-4 w-4" />
+                <span>Uncompleted ({uncompletedTasks.length})</span>
+              </TabsTrigger>
+              <TabsTrigger value="completed" className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4" />
+                <span>Completed Today ({completedTasks.length})</span>
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="uncompleted">
+              <div className="space-y-4">
+                {uncompletedTasks.length > 0 ? (
+                  uncompletedTasks.map((task) => (
+                    <TaskCard key={task.id} task={task} />
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">All Tasks Completed!</h3>
+                    <p className="text-gray-600">Great job! You've completed all your assigned tasks for today.</p>
                   </div>
-                  
-                  <div className="flex flex-col space-y-2 ml-4">
-                    {task.status === "Pending" && (
-                      <Button 
-                        size="sm" 
-                        onClick={() => handleStartTask(task.id)}
-                        className="whitespace-nowrap"
-                      >
-                        Start Task
-                      </Button>
-                    )}
-                    
-                    {task.status === "In Progress" && (
-                      <>
-                        <Button size="sm" variant="outline" className="whitespace-nowrap">
-                          <Phone className="h-4 w-4 mr-2" />
-                          Call Now
-                        </Button>
-                        
-                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button 
-                              size="sm" 
-                              variant="default"
-                              onClick={() => openCompleteDialog(task.id)}
-                              className="whitespace-nowrap"
-                            >
-                              Complete
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                              <DialogTitle>Complete Task</DialogTitle>
-                              <DialogDescription>
-                                Add a comment about your call with {tasks.find(t => t.id === selectedTaskId)?.retailerName} before marking this task as complete.
-                              </DialogDescription>
-                            </DialogHeader>
-                            
-                            <div className="space-y-4 py-4">
-                              <div className="space-y-2">
-                                <label htmlFor="comment" className="text-sm font-medium">
-                                  Call Outcome / Comments
-                                </label>
-                                <Textarea
-                                  id="comment"
-                                  placeholder="Describe the outcome of your call, any agreements made, follow-up actions needed, etc."
-                                  value={comment}
-                                  onChange={(e) => setComment(e.target.value)}
-                                  className="min-h-[100px]"
-                                />
-                              </div>
-                            </div>
-                            
-                            <DialogFooter>
-                              <Button 
-                                type="button" 
-                                variant="outline" 
-                                onClick={() => {
-                                  setIsDialogOpen(false);
-                                  setComment("");
-                                  setSelectedTaskId(null);
-                                }}
-                              >
-                                Cancel
-                              </Button>
-                              <Button 
-                                type="button" 
-                                onClick={handleCompleteTask}
-                                disabled={!comment.trim()}
-                              >
-                                Complete Task
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </>
-                    )}
-                    
-                    {task.status === "Completed" && (
-                      <div className="text-sm text-green-600 font-medium">
-                        ✓ Completed
-                      </div>
-                    )}
-                  </div>
-                </div>
+                )}
               </div>
-            ))}
-          </div>
+            </TabsContent>
+
+            <TabsContent value="completed">
+              <div className="space-y-4">
+                {completedTasks.length > 0 ? (
+                  completedTasks.map((task) => (
+                    <TaskCard key={task.id} task={task} showActions={false} showStatusBadge={false} />
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No Completed Tasks Yet</h3>
+                    <p className="text-gray-600">Complete your assigned tasks to see them here.</p>
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>
