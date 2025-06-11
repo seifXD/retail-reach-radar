@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -58,7 +59,7 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
         target: 10000,
         progress: 7500,
         lastRecharge: "2023-12-10",
-        rechargeMethod: "Mobile Money",
+        rechargeMethod: "Instant",
         creditScore: 85,
         accountStatus: "Active",
         cashInMode: "Enabled",
@@ -71,7 +72,7 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
         target: 8000,
         progress: 3200,
         lastRecharge: "2023-12-08",
-        rechargeMethod: "Bank Transfer",
+        rechargeMethod: "Normal",
         creditScore: 72,
         accountStatus: "Active",
         cashInMode: "Disabled",
@@ -84,7 +85,7 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
         target: 12000,
         progress: 9600,
         lastRecharge: "2023-12-12",
-        rechargeMethod: "Cash",
+        rechargeMethod: "Instant Plus",
         creditScore: 91,
         accountStatus: "Active",
         cashInMode: "Enabled",
@@ -99,7 +100,7 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
       target: 5000,
       progress: 2000,
       lastRecharge: "2023-12-01",
-      rechargeMethod: "Mobile Money",
+      rechargeMethod: "Normal",
       creditScore: 60,
       accountStatus: "Active",
       cashInMode: "Enabled",
