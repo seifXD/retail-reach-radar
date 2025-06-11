@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { Search, Phone, Target, TrendingUp, Filter, Zap } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Search, Phone, Target, TrendingUp, Filter, Zap, User, CreditCard, Smartphone, Wallet } from "lucide-react";
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from "@/hooks/use-toast";
 
@@ -22,6 +21,20 @@ interface Retailer {
   project_name?: string;
 }
 
+interface RetailerDetails {
+  id: string;
+  name: string;
+  target: number;
+  progress: number;
+  lastRecharge: string;
+  rechargeMethod: string;
+  creditScore: number;
+  accountStatus: "Active" | "Inactive" | "Suspended";
+  cashInMode: "Enabled" | "Disabled";
+  deviceModel: "POS" | "App";
+  walletStatus: "Active" | "Inactive" | "Pending";
+}
+
 const GoalOrientedCalling = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('balance_desc');
@@ -29,7 +42,76 @@ const GoalOrientedCalling = () => {
   const [loading, setLoading] = useState(true);
   const [rechargeGoal, setRechargeGoal] = useState(50000);
   const [currentProgress, setCurrentProgress] = useState(12500);
+  const [selectedRetailer, setSelectedRetailer] = useState<RetailerDetails | null>(null);
+  const [isRetailerDialogOpen, setIsRetailerDialogOpen] = useState(false);
   const { toast } = useToast();
+
+  // Mock retailer details - in real app this would come from database
+  const getRetailerDetails = (retailerId: string): RetailerDetails => {
+    const mockDetails: Record<string, RetailerDetails> = {
+      "RT001": {
+        id: "RT001",
+        name: "Michael Thompson",
+        target: 10000,
+        progress: 7500,
+        lastRecharge: "2023-12-10",
+        rechargeMethod: "Instant",
+        creditScore: 85,
+        accountStatus: "Active",
+        cashInMode: "Enabled",
+        deviceModel: "POS",
+        walletStatus: "Active"
+      },
+      "RT002": {
+        id: "RT002",
+        name: "Sarah Rodriguez",
+        target: 8000,
+        progress: 3200,
+        lastRecharge: "2023-12-08",
+        rechargeMethod: "Normal",
+        creditScore: 72,
+        accountStatus: "Active",
+        cashInMode: "Disabled",
+        deviceModel: "App",
+        walletStatus: "Active"
+      },
+      "RT003": {
+        id: "RT003",
+        name: "David Chen",
+        target: 12000,
+        progress: 9600,
+        lastRecharge: "2023-12-12",
+        rechargeMethod: "Instant Plus",
+        creditScore: 91,
+        accountStatus: "Active",
+        cashInMode: "Enabled",
+        deviceModel: "POS",
+        walletStatus: "Active"
+      }
+    };
+    
+    return mockDetails[retailerId] || {
+      id: retailerId,
+      name: "Unknown Retailer",
+      target: 5000,
+      progress: 2000,
+      lastRecharge: "2023-12-01",
+      rechargeMethod: "Normal",
+      creditScore: 60,
+      accountStatus: "Active",
+      cashInMode: "Enabled",
+      deviceModel: "App",
+      walletStatus: "Active"
+    };
+  };
+
+  const handleRetailerClick = (retailerId: string, retailerName: string) => {
+    const details = getRetailerDetails(retailerId);
+    // Update the name to match the actual retailer
+    details.name = retailerName;
+    setSelectedRetailer(details);
+    setIsRetailerDialogOpen(true);
+  };
 
   const fetchRetailers = async () => {
     try {
@@ -93,6 +175,16 @@ const GoalOrientedCalling = () => {
   useEffect(() => {
     fetchRetailers();
   }, []);
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "Active": return "default";
+      case "Inactive": return "secondary";
+      case "Suspended": return "destructive";
+      case "Pending": return "outline";
+      default: return "outline";
+    }
+  };
 
   const formatCurrency = (amount?: number) => {
     if (amount === null || amount === undefined) return 'N/A';
@@ -223,7 +315,12 @@ const GoalOrientedCalling = () => {
               <div key={retailer.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                 <div className="flex-1 space-y-2">
                   <div className="flex items-center space-x-3">
-                    <h3 className="font-medium text-gray-900">{retailer.name}</h3>
+                    <button
+                      onClick={() => handleRetailerClick(retailer.retailer_id, retailer.name)}
+                      className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+                    >
+                      {retailer.name}
+                    </button>
                     <Badge variant="outline">ID: {retailer.retailer_id}</Badge>
                     {(retailer.solde || 0) > 10000 && (
                       <Badge variant="default">High Balance</Badge>
@@ -263,9 +360,131 @@ const GoalOrientedCalling = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Retailer Details Dialog */}
+      <Dialog open={isRetailerDialogOpen} onOpenChange={setIsRetailerDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <User className="h-5 w-5" />
+              <span>{selectedRetailer?.name} Details</span>
+            </DialogTitle>
+            <DialogDescription>
+              Retailer ID: {selectedRetailer?.id}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedRetailer && (
+            <div className="space-y-6">
+              {/* Target & Progress */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <Target className="h-5 w-5" />
+                    <span>Target & Progress</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Monthly Target:</span>
+                    <span className="text-lg font-bold">${selectedRetailer.target.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Current Progress:</span>
+                    <span className="text-lg font-bold text-blue-600">${selectedRetailer.progress.toLocaleString()}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Progress</span>
+                      <span>{Math.round((selectedRetailer.progress / selectedRetailer.target) * 100)}%</span>
+                    </div>
+                    <Progress value={(selectedRetailer.progress / selectedRetailer.target) * 100} className="h-3" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Financial Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <CreditCard className="h-5 w-5" />
+                    <span>Financial Information</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Last Recharge</label>
+                    <p className="text-lg">{selectedRetailer.lastRecharge}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Recharge Method</label>
+                    <p className="text-lg">{selectedRetailer.rechargeMethod}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Credit Score</label>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-2xl font-bold text-blue-600">{selectedRetailer.creditScore}</span>
+                      <Badge variant={selectedRetailer.creditScore >= 80 ? "default" : selectedRetailer.creditScore >= 60 ? "secondary" : "destructive"}>
+                        {selectedRetailer.creditScore >= 80 ? "Excellent" : selectedRetailer.creditScore >= 60 ? "Good" : "Poor"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Cash-in Mode</label>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant={selectedRetailer.cashInMode === "Enabled" ? "default" : "secondary"}>
+                        {selectedRetailer.cashInMode}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Account & Device Status */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <Smartphone className="h-5 w-5" />
+                    <span>Account & Device Status</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Account Status</label>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Badge variant={getStatusBadgeVariant(selectedRetailer.accountStatus)}>
+                        {selectedRetailer.accountStatus}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Device Model</label>
+                    <div className="flex items-center space-x-2 mt-1">
+                      {selectedRetailer.deviceModel === "POS" ? (
+                        <CreditCard className="h-4 w-4" />
+                      ) : (
+                        <Smartphone className="h-4 w-4" />
+                      )}
+                      <span className="text-lg font-medium">{selectedRetailer.deviceModel}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Wallet Status</label>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Wallet className="h-4 w-4" />
+                      <Badge variant={getStatusBadgeVariant(selectedRetailer.walletStatus)}>
+                        {selectedRetailer.walletStatus}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
 export default GoalOrientedCalling;
-
