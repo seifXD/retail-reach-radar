@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Phone, Calendar, User, CheckCircle, Clock, AlertCircle, ChevronDown } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Phone, Calendar, User, CheckCircle, Clock, AlertCircle, ChevronDown, Target, CreditCard, Smartphone, Wallet, Battery } from "lucide-react";
 import { useState } from "react";
 
 interface Task {
@@ -22,6 +22,20 @@ interface Task {
   comment?: string;
 }
 
+interface RetailerDetails {
+  id: string;
+  name: string;
+  target: number;
+  progress: number;
+  lastRecharge: string;
+  rechargeMethod: string;
+  creditScore: number;
+  accountStatus: "Active" | "Inactive" | "Suspended";
+  cashInMode: "Enabled" | "Disabled";
+  deviceModel: "POS" | "App";
+  walletStatus: "Active" | "Inactive" | "Pending";
+}
+
 interface AssignedTasksProps {
   tasks: Task[];
   onTasksUpdate: (tasks: Task[]) => void;
@@ -32,6 +46,73 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
   const [selectedOutcome, setSelectedOutcome] = useState<string>("");
   const [comment, setComment] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedRetailer, setSelectedRetailer] = useState<RetailerDetails | null>(null);
+  const [isRetailerDialogOpen, setIsRetailerDialogOpen] = useState(false);
+
+  // Mock retailer details - in real app this would come from database
+  const getRetailerDetails = (retailerId: string): RetailerDetails => {
+    const mockDetails: Record<string, RetailerDetails> = {
+      "RT001": {
+        id: "RT001",
+        name: "Michael Thompson",
+        target: 10000,
+        progress: 7500,
+        lastRecharge: "2023-12-10",
+        rechargeMethod: "Mobile Money",
+        creditScore: 85,
+        accountStatus: "Active",
+        cashInMode: "Enabled",
+        deviceModel: "POS",
+        walletStatus: "Active"
+      },
+      "RT002": {
+        id: "RT002",
+        name: "Sarah Rodriguez",
+        target: 8000,
+        progress: 3200,
+        lastRecharge: "2023-12-08",
+        rechargeMethod: "Bank Transfer",
+        creditScore: 72,
+        accountStatus: "Active",
+        cashInMode: "Disabled",
+        deviceModel: "App",
+        walletStatus: "Active"
+      },
+      "RT003": {
+        id: "RT003",
+        name: "David Chen",
+        target: 12000,
+        progress: 9600,
+        lastRecharge: "2023-12-12",
+        rechargeMethod: "Cash",
+        creditScore: 91,
+        accountStatus: "Active",
+        cashInMode: "Enabled",
+        deviceModel: "POS",
+        walletStatus: "Active"
+      }
+    };
+    
+    return mockDetails[retailerId] || {
+      id: retailerId,
+      name: "Unknown Retailer",
+      target: 5000,
+      progress: 2000,
+      lastRecharge: "2023-12-01",
+      rechargeMethod: "Mobile Money",
+      creditScore: 60,
+      accountStatus: "Active",
+      cashInMode: "Enabled",
+      deviceModel: "App",
+      walletStatus: "Active"
+    };
+  };
+
+  const handleRetailerClick = (retailerId: string) => {
+    const details = getRetailerDetails(retailerId);
+    setSelectedRetailer(details);
+    setIsRetailerDialogOpen(true);
+  };
 
   const completedTasks = tasks.filter(task => task.status === 'Completed');
   const uncompletedTasks = tasks.filter(task => task.status !== 'Completed');
@@ -96,12 +177,27 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
     }
   };
 
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case "Active": return "default";
+      case "Inactive": return "secondary";
+      case "Suspended": return "destructive";
+      case "Pending": return "outline";
+      default: return "outline";
+    }
+  };
+
   const TaskCard = ({ task, showActions = true, showStatusBadge = true }: { task: Task; showActions?: boolean; showStatusBadge?: boolean }) => (
     <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
       <div className="flex-1 space-y-2">
         <div className="flex items-center space-x-3">
           {getStatusIcon(task.status)}
-          <h3 className="font-medium text-gray-900">{task.retailerName}</h3>
+          <button
+            onClick={() => handleRetailerClick(task.retailerId)}
+            className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+          >
+            {task.retailerName}
+          </button>
           <Badge variant={getPriorityVariant(task.priority)}>
             {task.priority}
           </Badge>
@@ -291,6 +387,129 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
               Mark as {selectedOutcome}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Retailer Details Dialog */}
+      <Dialog open={isRetailerDialogOpen} onOpenChange={setIsRetailerDialogOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center space-x-2">
+              <User className="h-5 w-5" />
+              <span>{selectedRetailer?.name} Details</span>
+            </DialogTitle>
+            <DialogDescription>
+              Retailer ID: {selectedRetailer?.id}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedRetailer && (
+            <div className="space-y-6">
+              {/* Target & Progress */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <Target className="h-5 w-5" />
+                    <span>Target & Progress</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Monthly Target:</span>
+                    <span className="text-lg font-bold">${selectedRetailer.target.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium">Current Progress:</span>
+                    <span className="text-lg font-bold text-blue-600">${selectedRetailer.progress.toLocaleString()}</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Progress</span>
+                      <span>{Math.round((selectedRetailer.progress / selectedRetailer.target) * 100)}%</span>
+                    </div>
+                    <Progress value={(selectedRetailer.progress / selectedRetailer.target) * 100} className="h-3" />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Financial Information */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <CreditCard className="h-5 w-5" />
+                    <span>Financial Information</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Last Recharge</label>
+                    <p className="text-lg">{selectedRetailer.lastRecharge}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Recharge Method</label>
+                    <p className="text-lg">{selectedRetailer.rechargeMethod}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Credit Score</label>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-2xl font-bold text-blue-600">{selectedRetailer.creditScore}</span>
+                      <Badge variant={selectedRetailer.creditScore >= 80 ? "default" : selectedRetailer.creditScore >= 60 ? "secondary" : "destructive"}>
+                        {selectedRetailer.creditScore >= 80 ? "Excellent" : selectedRetailer.creditScore >= 60 ? "Good" : "Poor"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Cash-in Mode</label>
+                    <div className="flex items-center space-x-2">
+                      <Badge variant={selectedRetailer.cashInMode === "Enabled" ? "default" : "secondary"}>
+                        {selectedRetailer.cashInMode}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Account & Device Status */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2 text-lg">
+                    <Smartphone className="h-5 w-5" />
+                    <span>Account & Device Status</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Account Status</label>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Badge variant={getStatusBadgeVariant(selectedRetailer.accountStatus)}>
+                        {selectedRetailer.accountStatus}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Device Model</label>
+                    <div className="flex items-center space-x-2 mt-1">
+                      {selectedRetailer.deviceModel === "POS" ? (
+                        <CreditCard className="h-4 w-4" />
+                      ) : (
+                        <Smartphone className="h-4 w-4" />
+                      )}
+                      <span className="text-lg font-medium">{selectedRetailer.deviceModel}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">Wallet Status</label>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Wallet className="h-4 w-4" />
+                      <Badge variant={getStatusBadgeVariant(selectedRetailer.walletStatus)}>
+                        {selectedRetailer.walletStatus}
+                      </Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
