@@ -1,9 +1,13 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { Phone, Calendar, User, CheckCircle, Clock, AlertCircle, ChevronDown } from "lucide-react";
+import { useState } from "react";
 
 interface Task {
   id: number;
@@ -15,6 +19,7 @@ interface Task {
   taskType: string;
   description: string;
   outcome?: string;
+  comment?: string;
 }
 
 interface AssignedTasksProps {
@@ -23,14 +28,34 @@ interface AssignedTasksProps {
 }
 
 const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
+  const [selectedTask, setSelectedTask] = useState<number | null>(null);
+  const [selectedOutcome, setSelectedOutcome] = useState<string>("");
+  const [comment, setComment] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
   const completedTasks = tasks.filter(task => task.status === 'Completed');
   const uncompletedTasks = tasks.filter(task => task.status !== 'Completed');
 
-  const markAsCompleted = (taskId: number, outcome: string) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, status: 'Completed' as const, outcome } : task
-    );
-    onTasksUpdate(updatedTasks);
+  const handleCompleteWithComment = (taskId: number, outcome: string) => {
+    setSelectedTask(taskId);
+    setSelectedOutcome(outcome);
+    setComment("");
+    setIsDialogOpen(true);
+  };
+
+  const confirmCompletion = () => {
+    if (selectedTask && selectedOutcome) {
+      const updatedTasks = tasks.map(task => 
+        task.id === selectedTask 
+          ? { ...task, status: 'Completed' as const, outcome: selectedOutcome, comment: comment.trim() || undefined } 
+          : task
+      );
+      onTasksUpdate(updatedTasks);
+      setIsDialogOpen(false);
+      setSelectedTask(null);
+      setSelectedOutcome("");
+      setComment("");
+    }
   };
 
   const markAsCalled = (taskId: number) => {
@@ -103,6 +128,11 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
         </div>
         <p className="text-sm text-gray-700 font-medium">{task.taskType}</p>
         <p className="text-sm text-gray-600">{task.description}</p>
+        {task.comment && (
+          <div className="mt-2 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+            <p className="text-sm text-gray-700"><strong>Comment:</strong> {task.comment}</p>
+          </div>
+        )}
       </div>
       {showActions && task.status !== 'Completed' && (
         <div className="flex space-x-2 ml-4">
@@ -122,15 +152,15 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48">
-              <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Reachable')}>
+              <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Reachable')}>
                 <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
                 Reachable
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Unreachable')}>
+              <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Unreachable')}>
                 <AlertCircle className="h-4 w-4 mr-2 text-red-600" />
                 Unreachable
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => markAsCompleted(task.id, 'Not Interested')}>
+              <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Not Interested')}>
                 <Clock className="h-4 w-4 mr-2 text-yellow-600" />
                 Not Interested
               </DropdownMenuItem>
@@ -229,6 +259,40 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Comment Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Add Call Comment</DialogTitle>
+            <DialogDescription>
+              Please add a comment about your call before marking this task as {selectedOutcome?.toLowerCase()}.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <label htmlFor="comment" className="text-sm font-medium">
+                Call Notes (Optional)
+              </label>
+              <Textarea
+                id="comment"
+                placeholder="Add any notes about the call..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                rows={4}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={confirmCompletion}>
+              Mark as {selectedOutcome}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
