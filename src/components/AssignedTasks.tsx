@@ -5,7 +5,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
 import { Phone, Calendar, User, CheckCircle, Clock, AlertCircle, ChevronDown, Target, CreditCard, Smartphone, Wallet, Battery } from "lucide-react";
 import { useState } from "react";
 
@@ -193,6 +192,46 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
     }
   };
 
+  const CircularProgress = ({ value, size = 60 }: { value: number; size?: number }) => {
+    const radius = (size - 8) / 2;
+    const circumference = 2 * Math.PI * radius;
+    const strokeDasharray = circumference;
+    const strokeDashoffset = circumference - (value / 100) * circumference;
+
+    return (
+      <div className="relative inline-flex items-center justify-center">
+        <svg width={size} height={size} className="transform -rotate-90">
+          {/* Background circle */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
+            className="text-gray-200"
+          />
+          {/* Progress circle */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="currentColor"
+            strokeWidth="4"
+            fill="none"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            className="text-blue-600 transition-all duration-300 ease-in-out"
+            strokeLinecap="round"
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xs font-semibold text-gray-700">{Math.round(value)}%</span>
+        </div>
+      </div>
+    );
+  };
+
   const TaskCard = ({ task, showActions = true, showStatusBadge = true }: { task: Task; showActions?: boolean; showStatusBadge?: boolean }) => {
     const taskProgress = task.progress || (task.status === 'Completed' ? 100 : task.status === 'In Progress' ? 30 : 0);
     
@@ -234,55 +273,55 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
           <p className="text-sm text-gray-700 font-medium">{task.taskType}</p>
           <p className="text-sm text-gray-600">{task.description}</p>
           
-          {/* Progress Bar */}
-          <div className="space-y-1">
-            <div className="flex justify-between text-xs text-gray-500">
-              <span>Task Progress</span>
-              <span>{taskProgress}%</span>
-            </div>
-            <Progress value={taskProgress} className="h-2" />
-          </div>
-          
           {task.comment && (
             <div className="mt-2 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
               <p className="text-sm text-gray-700"><strong>Comment:</strong> {task.comment}</p>
             </div>
           )}
         </div>
-        {showActions && task.status !== 'Completed' && (
-          <div className="flex space-x-2 ml-4">
-            <Button 
-              size="sm" 
-              variant="outline"
-              onClick={() => markAsCalled(task.id)}
-            >
-              <Phone className="h-4 w-4 mr-2" />
-              Call Now
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="sm">
-                  Mark Complete
-                  <ChevronDown className="h-4 w-4 ml-2" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48">
-                <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Reachable')}>
-                  <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
-                  Reachable
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Unreachable')}>
-                  <AlertCircle className="h-4 w-4 mr-2 text-red-600" />
-                  Unreachable
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Not Interested')}>
-                  <Clock className="h-4 w-4 mr-2 text-yellow-600" />
-                  Not Interested
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        
+        {/* Progress Circle */}
+        <div className="flex items-center space-x-4 ml-4">
+          <div className="flex flex-col items-center space-y-1">
+            <CircularProgress value={taskProgress} size={50} />
+            <span className="text-xs text-gray-500 font-medium">Progress</span>
           </div>
-        )}
+          
+          {showActions && task.status !== 'Completed' && (
+            <div className="flex space-x-2">
+              <Button 
+                size="sm" 
+                variant="outline"
+                onClick={() => markAsCalled(task.id)}
+              >
+                <Phone className="h-4 w-4 mr-2" />
+                Call Now
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="sm">
+                    Mark Complete
+                    <ChevronDown className="h-4 w-4 ml-2" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-48">
+                  <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Reachable')}>
+                    <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                    Reachable
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Unreachable')}>
+                    <AlertCircle className="h-4 w-4 mr-2 text-red-600" />
+                    Unreachable
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Not Interested')}>
+                    <Clock className="h-4 w-4 mr-2 text-yellow-600" />
+                    Not Interested
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -447,7 +486,12 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
                       <span>Progress</span>
                       <span>{Math.round((selectedRetailer.progress / selectedRetailer.target) * 100)}%</span>
                     </div>
-                    <Progress value={(selectedRetailer.progress / selectedRetailer.target) * 100} className="h-3" />
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${(selectedRetailer.progress / selectedRetailer.target) * 100}%` }}
+                      ></div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
