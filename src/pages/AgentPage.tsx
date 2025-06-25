@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +19,7 @@ interface Task {
   taskType: string;
   description: string;
   outcome?: string;
+  progress?: number;
 }
 
 const AgentPage = () => {
@@ -31,7 +33,8 @@ const AgentPage = () => {
       dueDate: "2023-12-16",
       status: "In Progress" as const,
       taskType: "Follow-up call",
-      description: "Follow up on product line interest. Prepare proposal."
+      description: "Follow up on product line interest. Prepare proposal.",
+      progress: 75
     },
     {
       id: 2,
@@ -41,7 +44,8 @@ const AgentPage = () => {
       dueDate: "2023-12-17",
       status: "Pending" as const,
       taskType: "Credit review",
-      description: "Review payment history and adjust credit terms if needed."
+      description: "Review payment history and adjust credit terms if needed.",
+      progress: 0
     },
     {
       id: 3,
@@ -51,7 +55,8 @@ const AgentPage = () => {
       dueDate: "2023-12-15",
       status: "Completed" as const,
       taskType: "Order processing",
-      description: "Process and confirm large furniture order. Verify inventory."
+      description: "Process and confirm large furniture order. Verify inventory.",
+      progress: 100
     }
   ]);
 

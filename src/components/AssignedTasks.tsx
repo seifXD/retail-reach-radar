@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,6 +20,7 @@ interface Task {
   description: string;
   outcome?: string;
   comment?: string;
+  progress?: number; // Progress percentage (0-100)
 }
 
 interface RetailerDetails {
@@ -129,7 +129,7 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
     if (selectedTask && selectedOutcome) {
       const updatedTasks = tasks.map(task => 
         task.id === selectedTask 
-          ? { ...task, status: 'Completed' as const, outcome: selectedOutcome, comment: comment.trim() || undefined } 
+          ? { ...task, status: 'Completed' as const, outcome: selectedOutcome, comment: comment.trim() || undefined, progress: 100 } 
           : task
       );
       onTasksUpdate(updatedTasks);
@@ -141,9 +141,14 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
   };
 
   const markAsCalled = (taskId: number) => {
-    const updatedTasks = tasks.map(task => 
-      task.id === taskId ? { ...task, status: 'In Progress' as const } : task
-    );
+    const updatedTasks = tasks.map(task => {
+      if (task.id === taskId) {
+        // Increase progress by 25% when marking as called, or set to 50% if it was 0
+        const newProgress = task.progress ? Math.min(task.progress + 25, 90) : 50;
+        return { ...task, status: 'In Progress' as const, progress: newProgress };
+      }
+      return task;
+    });
     onTasksUpdate(updatedTasks);
   };
 
@@ -188,85 +193,99 @@ const AssignedTasks = ({ tasks, onTasksUpdate }: AssignedTasksProps) => {
     }
   };
 
-  const TaskCard = ({ task, showActions = true, showStatusBadge = true }: { task: Task; showActions?: boolean; showStatusBadge?: boolean }) => (
-    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-      <div className="flex-1 space-y-2">
-        <div className="flex items-center space-x-3">
-          {getStatusIcon(task.status)}
-          <button
-            onClick={() => handleRetailerClick(task.retailerId)}
-            className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
-          >
-            {task.retailerName}
-          </button>
-          <Badge variant={getPriorityVariant(task.priority)}>
-            {task.priority}
-          </Badge>
-          {showStatusBadge && (
-            <Badge variant="outline">
-              {task.status}
+  const TaskCard = ({ task, showActions = true, showStatusBadge = true }: { task: Task; showActions?: boolean; showStatusBadge?: boolean }) => {
+    const taskProgress = task.progress || (task.status === 'Completed' ? 100 : task.status === 'In Progress' ? 30 : 0);
+    
+    return (
+      <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center space-x-3">
+            {getStatusIcon(task.status)}
+            <button
+              onClick={() => handleRetailerClick(task.retailerId)}
+              className="font-medium text-gray-900 hover:text-blue-600 hover:underline cursor-pointer"
+            >
+              {task.retailerName}
+            </button>
+            <Badge variant={getPriorityVariant(task.priority)}>
+              {task.priority}
             </Badge>
-          )}
-          {task.outcome && (
-            <div className={`inline-flex items-center rounded-full border ${getOutcomeStyles(task.outcome)}`}>
-              {task.outcome}
+            {showStatusBadge && (
+              <Badge variant="outline">
+                {task.status}
+              </Badge>
+            )}
+            {task.outcome && (
+              <div className={`inline-flex items-center rounded-full border ${getOutcomeStyles(task.outcome)}`}>
+                {task.outcome}
+              </div>
+            )}
+          </div>
+          <div className="flex items-center space-x-6 text-sm text-gray-600">
+            <div className="flex items-center space-x-1">
+              <User className="h-4 w-4" />
+              <span>ID: {task.retailerId}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Calendar className="h-4 w-4" />
+              <span>Due: {task.dueDate}</span>
+            </div>
+          </div>
+          <p className="text-sm text-gray-700 font-medium">{task.taskType}</p>
+          <p className="text-sm text-gray-600">{task.description}</p>
+          
+          {/* Progress Bar */}
+          <div className="space-y-1">
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>Task Progress</span>
+              <span>{taskProgress}%</span>
+            </div>
+            <Progress value={taskProgress} className="h-2" />
+          </div>
+          
+          {task.comment && (
+            <div className="mt-2 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
+              <p className="text-sm text-gray-700"><strong>Comment:</strong> {task.comment}</p>
             </div>
           )}
         </div>
-        <div className="flex items-center space-x-6 text-sm text-gray-600">
-          <div className="flex items-center space-x-1">
-            <User className="h-4 w-4" />
-            <span>ID: {task.retailerId}</span>
-          </div>
-          <div className="flex items-center space-x-1">
-            <Calendar className="h-4 w-4" />
-            <span>Due: {task.dueDate}</span>
-          </div>
-        </div>
-        <p className="text-sm text-gray-700 font-medium">{task.taskType}</p>
-        <p className="text-sm text-gray-600">{task.description}</p>
-        {task.comment && (
-          <div className="mt-2 p-2 bg-blue-50 rounded border-l-4 border-blue-400">
-            <p className="text-sm text-gray-700"><strong>Comment:</strong> {task.comment}</p>
+        {showActions && task.status !== 'Completed' && (
+          <div className="flex space-x-2 ml-4">
+            <Button 
+              size="sm" 
+              variant="outline"
+              onClick={() => markAsCalled(task.id)}
+            >
+              <Phone className="h-4 w-4 mr-2" />
+              Call Now
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm">
+                  Mark Complete
+                  <ChevronDown className="h-4 w-4 ml-2" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-48">
+                <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Reachable')}>
+                  <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                  Reachable
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Unreachable')}>
+                  <AlertCircle className="h-4 w-4 mr-2 text-red-600" />
+                  Unreachable
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Not Interested')}>
+                  <Clock className="h-4 w-4 mr-2 text-yellow-600" />
+                  Not Interested
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
       </div>
-      {showActions && task.status !== 'Completed' && (
-        <div className="flex space-x-2 ml-4">
-          <Button 
-            size="sm" 
-            variant="outline"
-            onClick={() => markAsCalled(task.id)}
-          >
-            <Phone className="h-4 w-4 mr-2" />
-            Call Now
-          </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm">
-                Mark Complete
-                <ChevronDown className="h-4 w-4 ml-2" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48">
-              <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Reachable')}>
-                <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
-                Reachable
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Unreachable')}>
-                <AlertCircle className="h-4 w-4 mr-2 text-red-600" />
-                Unreachable
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleCompleteWithComment(task.id, 'Not Interested')}>
-                <Clock className="h-4 w-4 mr-2 text-yellow-600" />
-                Not Interested
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      )}
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="space-y-6">
