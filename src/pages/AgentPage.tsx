@@ -1,26 +1,13 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Phone, Target, TrendingUp, Lock, Flag } from "lucide-react";
+import { TrendingUp, Target, Flag, Phone, Lock } from "lucide-react";
 import AgentDashboard from "@/components/AgentDashboard";
 import AssignedTasks from "@/components/AssignedTasks";
 import GoalOrientedCalling from "@/components/GoalOrientedCalling";
 import Header from "@/components/Header";
-
-interface Task {
-  id: number;
-  retailerName: string;
-  retailerId: string;
-  priority: "High" | "Medium" | "Low";
-  dueDate: string;
-  status: "Pending" | "In Progress" | "Completed";
-  taskType: string;
-  description: string;
-  outcome?: string;
-  progress?: number;
-}
+import { Task } from "@/types/tasks";
 
 const AgentPage = () => {
   // Mock data for assigned tasks - in real app this would come from database
