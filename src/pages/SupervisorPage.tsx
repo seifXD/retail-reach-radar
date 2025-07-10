@@ -2,10 +2,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Phone, Target, TrendingUp } from "lucide-react";
+import { Users, Target, TrendingUp, Settings } from "lucide-react";
 import SupervisorDashboard from "@/components/SupervisorDashboard";
 import RetailerProfiles from "@/components/RetailerProfiles";
 import TaskManagement from "@/components/TaskManagement";
+import SuperUserPanel from "@/components/SuperUserPanel";
 import Header from "@/components/Header";
 
 const SupervisorPage = () => {
@@ -29,9 +30,9 @@ const SupervisorPage = () => {
               <Target className="h-4 w-4" />
               <span>Tasks</span>
             </TabsTrigger>
-            <TabsTrigger value="calls" className="flex items-center space-x-2">
-              <Phone className="h-4 w-4" />
-              <span>Call Log</span>
+            <TabsTrigger value="superuser" className="flex items-center space-x-2">
+              <Settings className="h-4 w-4" />
+              <span>Super User</span>
             </TabsTrigger>
           </TabsList>
 
@@ -47,33 +48,8 @@ const SupervisorPage = () => {
             <TaskManagement userRole="supervisor" />
           </TabsContent>
 
-          <TabsContent value="calls">
-            <Card>
-              <CardHeader>
-                <CardTitle>Call History</CardTitle>
-                <CardDescription>Recent calls and outcomes</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {[1, 2, 3, 4, 5].map((call) => (
-                    <div key={call} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <div className="bg-blue-100 p-2 rounded-full">
-                          <Phone className="h-4 w-4 text-blue-600" />
-                        </div>
-                        <div>
-                          <p className="font-medium">Retailer #{call}23</p>
-                          <p className="text-sm text-gray-500">Called 2 hours ago</p>
-                        </div>
-                      </div>
-                      <Badge variant={call % 3 === 0 ? "default" : call % 2 === 0 ? "secondary" : "outline"}>
-                        {call % 3 === 0 ? "Interested" : call % 2 === 0 ? "Follow-up" : "No Answer"}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="superuser">
+            <SuperUserPanel />
           </TabsContent>
         </Tabs>
       </main>
