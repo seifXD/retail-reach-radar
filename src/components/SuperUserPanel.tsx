@@ -55,11 +55,10 @@ const SuperUserPanel = () => {
       
       // Calculate countdown
       const diff = next.getTime() - now.getTime();
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const minutes = Math.floor(diff / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
       
-      setCountdown(`${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
+      setCountdown(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
     };
 
     calculateNextDispatch();
@@ -90,24 +89,12 @@ const SuperUserPanel = () => {
 
   return (
     <div className="space-y-6">
-      {/* Timer Card */}
-      <Card className="bg-gradient-to-r from-purple-500 to-purple-600 text-white">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Clock className="h-5 w-5" />
-            <span>Next Dispatch Timer</span>
-          </CardTitle>
-          <CardDescription className="text-purple-100">
-            Automatic dispatch occurs every hour at 30 minutes past
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center space-y-2">
-            <div className="text-3xl font-bold">{nextDispatch}</div>
-            <Badge variant="secondary" className="text-lg px-4 py-2">
-              {countdown}
-            </Badge>
-            <p className="text-sm text-purple-100">Time until next dispatch</p>
+      {/* Compact Timer Card */}
+      <Card className="bg-slate-50 border-slate-200">
+        <CardContent className="p-4">
+          <div className="text-center">
+            <div className="text-sm text-slate-600 mb-1">Next dispatch at {nextDispatch}</div>
+            <div className="text-2xl font-bold text-green-600">{countdown} remaining</div>
           </div>
         </CardContent>
       </Card>
